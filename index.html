@@ -886,16 +886,10 @@ document.getElementById('fecha-display').textContent = hoy.getDate().toString().
 
 loadStorage();
 </script>
-<!-- Vercel Analytics - CDN -->
-<script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
+<!-- Vercel Web Analytics -->
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  // Enviar pageview cuando cargue
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.va) {
-      window.va('pageview');
-    }
-  });
 </script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
