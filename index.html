@@ -63,6 +63,32 @@ body{font-family:'Barlow',system-ui,sans-serif;background:var(--gris-bg);color:v
 .sync-bar.show{display:block;}
 .content{flex:1;padding:1rem;padding-bottom:calc(1rem + var(--safe-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
+/* ADMIN PANEL IMPROVED */
+.admin-screen{padding:0;}
+.admin-header{background:var(--azul);color:#fff;padding:0.6rem 1rem;display:flex;align-items:center;justify-content:space-between;margin:0 -1rem;margin-top:-1rem;margin-bottom:1rem;}
+.admin-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;}
+.admin-badge{font-size:9px;background:var(--amarillo);color:var(--azul);padding:2px 8px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.stat-card{background:#fff;border-top:3px solid var(--amarillo);padding:0.6rem;text-align:center;box-shadow:0 1px 4px rgba(21,50,68,0.06);}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--azul);line-height:1;}
+.stat-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gris-texto);margin-top:2px;}
+.admin-download-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.admin-dl-btn{padding:10px 6px;border:none;font-family:'Barlow',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:4px;}
+.admin-dl-auto{background:var(--celeste);color:var(--azul);}
+.admin-dl-moto{background:var(--amarillo);color:var(--azul);}
+.admin-dl-all{background:var(--azul);color:#fff;grid-column:span 2;}
+.admin-dl-btn:active{opacity:0.85;}
+.admin-table-wrap{overflow-x:auto;border:1px solid var(--gris-borde);border-radius:4px;margin-bottom:1rem;}
+.admin-table{width:100%;border-collapse:collapse;font-size:11px;min-width:480px;}
+.admin-table th{background:var(--azul);color:#fff;padding:8px 10px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap;position:sticky;top:0;}
+.admin-table td{padding:7px 10px;border-bottom:1px solid var(--gris-borde);white-space:nowrap;color:var(--azul);}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:#f0f7ff;}
+.tipo-pill{font-size:9px;font-weight:800;padding:2px 6px;text-transform:uppercase;border-radius:3px;}
+.tipo-auto{background:rgba(91,196,212,0.2);color:var(--celeste);}
+.tipo-moto{background:rgba(255,210,0,0.2);color:#b8860b;}
+.loading-state{text-align:center;padding:2rem;color:var(--gris-texto);font-size:12px;}
+
 /* AUTH SCREEN */
 .auth-screen{min-height:100vh;background:var(--azul);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
 .auth-logo{height:64px;margin-bottom:1.5rem;}
@@ -85,7 +111,7 @@ body{font-family:'Barlow',system-ui,sans-serif;background:var(--gris-bg);color:v
 .auth-ok.show{display:block;}
 
 /* PANEL ADMIN */
-.admin-screen{padding:1rem;}
+.admin-screen{padding:0;}
 .admin-header{background:var(--azul);color:#fff;padding:0.75rem 1rem;margin:-1rem -1rem 1rem;display:flex;align-items:center;justify-content:space-between;}
 .admin-title{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;}
 .admin-badge{font-size:9px;background:var(--amarillo);color:var(--azul);padding:2px 8px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;}
@@ -186,6 +212,56 @@ body{font-family:'Barlow',system-ui,sans-serif;background:var(--gris-bg);color:v
 .install-text strong{color:var(--teal);display:block;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px;}
 .install-btn{padding:7px 14px;background:var(--amarillo);color:var(--azul);font-family:'Barlow',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;}
 .install-close{color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;flex-shrink:0;background:none;border:none;}
+
+/* ── RESPONSIVE & UX IMPROVEMENTS ── */
+@media (min-width: 600px) {
+  .app { box-shadow: 0 0 40px rgba(21,50,68,0.15); }
+  .auth-screen { padding: 3rem 2rem; }
+  .auth-card { border-radius: 8px; box-shadow: 0 8px 32px rgba(21,50,68,0.12); }
+}
+
+/* Better tap targets */
+.chip-opt, .check-opt { min-height: 44px; display:flex;align-items:center; }
+.check-opt { gap: 8px; }
+.btn, .btn-guardar, .btn-continuar { min-height: 50px; }
+select, input[type=text], input[type=email], input[type=password], input[type=number] { min-height: 44px; }
+
+/* Smoother transitions */
+.chip-opt, .check-opt, .btn, .btn-guardar, .icon-bar-btn { transition: all 0.12s ease; }
+.panel { border-radius: 4px; }
+
+/* Better error styling */
+.err.show { display: flex; align-items: center; gap: 4px; }
+.err.show::before { content: '!'; width: 14px; height: 14px; background: var(--rojo); color: #fff; border-radius: 50%; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Pasajero subsection */
+.pasajero-sub { border-radius: 4px; }
+
+/* Icon bar rounded */
+.icon-bar { border-radius: 6px; }
+
+/* Guardar button pulse when ready */
+.btn-guardar:not(:disabled) { animation: none; }
+
+/* Admin table responsive */
+@media (max-width: 400px) {
+  .admin-table { font-size: 10px; }
+  .admin-table th, .admin-table td { padding: 6px 7px; }
+}
+
+/* Smooth scroll */
+.content { scroll-behavior: smooth; }
+
+/* Better modal on large screens */
+@media (min-width: 600px) {
+  .modal { border-radius: 8px; }
+  .modal-overlay { align-items: center; }
+}
+
+/* Loading spinner for admin */
+.admin-loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 2rem; color: var(--gris-texto); font-size: 12px; font-weight: 600; }
+.spinner { width: 20px; height: 20px; border: 2px solid var(--gris-borde); border-top-color: var(--azul); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -582,30 +658,65 @@ body{font-family:'Barlow',system-ui,sans-serif;background:var(--gris-bg);color:v
     <!-- PANEL ADMIN -->
     <div id="panel-admin" style="display:none">
       <div class="admin-screen">
+
         <div class="admin-header">
-          <span class="admin-title">Panel de Administracion</span>
+          <span class="admin-title">&#9776; Panel de Administracion</span>
           <span class="admin-badge">Admin</span>
         </div>
 
-        <div class="admin-filters">
-          <select id="admin-filter-user" onchange="cargarAdmin()">
-            <option value="">Todos los usuarios</option>
-          </select>
-          <select id="admin-filter-tipo" onchange="cargarAdmin()">
-            <option value="">Autos y Motos</option>
-            <option value="auto">Solo Autos</option>
-            <option value="moto">Solo Motos</option>
-          </select>
-          <input type="date" id="admin-filter-desde" onchange="cargarAdmin()" placeholder="Desde"/>
-          <input type="date" id="admin-filter-hasta" onchange="cargarAdmin()" placeholder="Hasta"/>
+        <!-- FILTROS -->
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);padding:0.85rem 1rem;margin-bottom:1rem;border-radius:4px;">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--azul);margin-bottom:0.75rem;">Filtros</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--gris-texto);margin-bottom:3px;">Usuario</div>
+              <select id="admin-filter-user" onchange="cargarAdmin()" style="width:100%;padding:8px 10px;font-size:12px;font-family:'Barlow',sans-serif;border:1.5px solid var(--gris-borde);background:var(--gris-bg);color:var(--azul);appearance:none;">
+                <option value="">Todos</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--gris-texto);margin-bottom:3px;">Tipo</div>
+              <select id="admin-filter-tipo" onchange="cargarAdmin()" style="width:100%;padding:8px 10px;font-size:12px;font-family:'Barlow',sans-serif;border:1.5px solid var(--gris-borde);background:var(--gris-bg);color:var(--azul);appearance:none;">
+                <option value="">Autos y Motos</option>
+                <option value="auto">Solo Autos</option>
+                <option value="moto">Solo Motos</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--gris-texto);margin-bottom:3px;">Desde</div>
+              <input type="date" id="admin-filter-desde" onchange="cargarAdmin()" style="width:100%;padding:8px 10px;font-size:12px;font-family:'Barlow',sans-serif;border:1.5px solid var(--gris-borde);background:var(--gris-bg);color:var(--azul);"/>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--gris-texto);margin-bottom:3px;">Hasta</div>
+              <input type="date" id="admin-filter-hasta" onchange="cargarAdmin()" style="width:100%;padding:8px 10px;font-size:12px;font-family:'Barlow',sans-serif;border:1.5px solid var(--gris-borde);background:var(--gris-bg);color:var(--azul);"/>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--gris-texto);margin-bottom:3px;">Tramo / Punto de observacion</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="admin-filter-tramo" placeholder="Buscar por tramo..." autocomplete="off"
+                style="flex:1;padding:8px 10px;font-size:12px;font-family:'Barlow',sans-serif;border:1.5px solid var(--gris-borde);background:var(--gris-bg);color:var(--azul);"
+                oninput="cargarAdmin()"/>
+              <button onclick="limpiarFiltros()" style="padding:8px 12px;border:1.5px solid var(--gris-borde);background:var(--gris-bg);font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--gris-texto);cursor:pointer;white-space:nowrap;">
+                Limpiar
+              </button>
+            </div>
+          </div>
         </div>
 
+        <!-- STATS -->
         <div class="admin-stats">
           <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
           <div class="stat-card"><div class="stat-num" id="stat-autos">0</div><div class="stat-lbl">Autos</div></div>
           <div class="stat-card"><div class="stat-num" id="stat-motos">0</div><div class="stat-lbl">Motos</div></div>
         </div>
 
+        <!-- DESCARGA -->
         <div class="admin-download-row">
           <button class="admin-dl-btn admin-dl-auto" onclick="descargarAdminTXT('auto')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -617,20 +728,27 @@ body{font-family:'Barlow',system-ui,sans-serif;background:var(--gris-bg);color:v
           </button>
           <button class="admin-dl-btn admin-dl-all" onclick="descargarAdminTXT('todos')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Descargar todo
+            Descargar todo (aplicar filtros)
           </button>
         </div>
 
+        <!-- TABLA -->
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>#</th><th>Fecha</th><th>Obs.</th><th>Tipo</th>
-                <th>Turno</th><th>Tramo</th><th>Subtipo/Uso</th>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Usuario</th>
+                <th>Tipo</th>
+                <th>Turno</th>
+                <th>Tramo</th>
+                <th>Subtipo/Uso</th>
               </tr>
             </thead>
             <tbody id="admin-tbody">
-              <tr><td colspan="7" class="loading-state">Cargando...</td></tr>
+              <tr><td colspan="8" class="loading-state">Cargando...</td></tr>
             </tbody>
           </table>
         </div>
@@ -762,13 +880,32 @@ db.auth.onAuthStateChange(async (event, session) => {
 });
 
 async function cargarPerfil() {
-  const { data } = await db.from('perfiles').select('*').eq('id', currentUser.id).single();
-  currentPerfil = data;
-  const nombre = data?.nombre || currentUser.email.split('@')[0];
-  document.getElementById('user-chip').textContent = nombre;
-  document.getElementById('observador').value = nombre;
-  if (data?.es_admin) {
-    document.getElementById('btn-admin-link').style.display = 'block';
+  try {
+    const { data, error } = await db.from('perfiles').select('*').eq('id', currentUser.id).single();
+
+    if (error || !data) {
+      // Perfil no existe aun — crearlo
+      const nombre = currentUser.user_metadata?.nombre || currentUser.email.split('@')[0];
+      await db.from('perfiles').upsert({ id: currentUser.id, nombre, es_admin: false });
+      currentPerfil = { id: currentUser.id, nombre, es_admin: false };
+    } else {
+      currentPerfil = data;
+    }
+
+    const nombre = currentPerfil?.nombre || currentUser.email.split('@')[0];
+    document.getElementById('user-chip').textContent = nombre;
+    document.getElementById('observador').value = nombre;
+
+    // Mostrar boton admin si corresponde
+    if (currentPerfil?.es_admin === true || currentPerfil?.es_admin === 'TRUE') {
+      document.getElementById('btn-admin-link').style.display = 'block';
+    }
+
+  } catch(e) {
+    // Fallback silencioso
+    const nombre = currentUser.email.split('@')[0];
+    document.getElementById('user-chip').textContent = nombre;
+    document.getElementById('observador').value = nombre;
   }
 }
 
@@ -1414,6 +1551,10 @@ function mostrarAdmin() {
   document.getElementById('panel-admin').style.display='block';
   document.getElementById('counter-area').style.display='none';
   document.getElementById('stepper-bar').style.display='none';
+  // Scroll al top inmediatamente
+  const content = document.getElementById('main-content');
+  content.scrollTop = 0;
+  window.scrollTo(0,0);
   cargarAdmin();
 }
 
@@ -1424,65 +1565,95 @@ function cerrarAdmin() {
   setStep(1);
 }
 
+// Cache de perfiles para mostrar nombres
+let perfilesCache = {};
+
 async function cargarAdmin() {
-  const tbody   = document.getElementById('admin-tbody');
-  const filtUser = document.getElementById('admin-filter-user').value;
-  const filtTipo = document.getElementById('admin-filter-tipo').value;
-  const filtDesde= document.getElementById('admin-filter-desde').value;
-  const filtHasta= document.getElementById('admin-filter-hasta').value;
+  const tbody     = document.getElementById('admin-tbody');
+  const filtUser  = document.getElementById('admin-filter-user').value;
+  const filtTipo  = document.getElementById('admin-filter-tipo').value;
+  const filtDesde = document.getElementById('admin-filter-desde').value;
+  const filtHasta = document.getElementById('admin-filter-hasta').value;
+  const filtTramo = document.getElementById('admin-filter-tramo').value.trim().toLowerCase();
 
-  tbody.innerHTML = '<tr><td colspan="7" class="loading-state">Cargando...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8"><div class="admin-loading"><div class="spinner"></div>Cargando registros...</div></td></tr>';
 
-  let query = db.from('registros').select('*, perfiles(nombre)').order('created_at', {ascending:false}).limit(500);
+  // Cargar perfiles primero (para nombres y filtro de usuario)
+  const { data: perfs } = await db.from('perfiles').select('id, nombre');
+  if (perfs) {
+    perfilesCache = {};
+    perfs.forEach(p => perfilesCache[p.id] = p.nombre);
+    const sel = document.getElementById('admin-filter-user');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Todos</option>' +
+      perfs.map(p => '<option value="'+p.id+'"'+(p.id===cur?' selected':'')+'>'+p.nombre+'</option>').join('');
+  }
+
+  // Query registros sin join (evita problemas de RLS con foreign key)
+  let query = db.from('registros')
+    .select('id, created_at, timestamp_reg, fecha, turno, tramo, tipo, observador_id, observador_nombre, subtipo, uso, genero, cinturon, casco, distracciones, pasajeros, pd_edad, pd_cin, pi_edad, pi_cin, pc_edad, pc_cin, pde_edad, pde_cin, pext1_edad, pext2_edad, tiene_pas, mp_edad, mp_cas, mp_gen, tiene_pas_extra, mpe_edad, mpe_cas, mpe_gen, tiene_pat, mercosur, patente')
+    .order('created_at', { ascending: false })
+    .limit(1000);
+
   if (filtUser)  query = query.eq('observador_id', filtUser);
   if (filtTipo)  query = query.eq('tipo', filtTipo);
   if (filtDesde) query = query.gte('fecha', filtDesde);
   if (filtHasta) query = query.lte('fecha', filtHasta);
 
   const { data, error } = await query;
-  if (error) { tbody.innerHTML = '<tr><td colspan="7" class="loading-state">Error al cargar datos</td></tr>'; return; }
 
-  adminRegistros = data || [];
+  if (error) {
+    console.error('Admin error:', error);
+    tbody.innerHTML = '<tr><td colspan="8" class="loading-state" style="color:var(--rojo)">Error: '+error.message+'</td></tr>';
+    return;
+  }
+
+  // Filtro de tramo client-side (búsqueda parcial)
+  adminRegistros = (data || []).filter(r => {
+    if (!filtTramo) return true;
+    return (r.tramo || '').toLowerCase().includes(filtTramo);
+  });
 
   // Stats
   document.getElementById('stat-total').textContent = adminRegistros.length;
   document.getElementById('stat-autos').textContent = adminRegistros.filter(r=>r.tipo==='auto').length;
   document.getElementById('stat-motos').textContent = adminRegistros.filter(r=>r.tipo==='moto').length;
 
-  // Cargar usuarios en filtro
-  const { data: perfs } = await db.from('perfiles').select('id,nombre');
-  if (perfs) {
-    const sel = document.getElementById('admin-filter-user');
-    const cur = sel.value;
-    sel.innerHTML = '<option value="">Todos los usuarios</option>' +
-      perfs.map(p=>'<option value="'+p.id+'"'+(p.id===cur?' selected':'')+'>'+p.nombre+'</option>').join('');
-  }
-
-  // Render table
   if (adminRegistros.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="loading-state">Sin registros</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="loading-state">Sin registros para los filtros seleccionados</td></tr>';
     return;
   }
-  tbody.innerHTML = adminRegistros.map((r,i) =>
-    '<tr>'+
-    '<td>'+(i+1)+'</td>'+
-    '<td>'+formatFechaTbl(r.fecha)+'</td>'+
-    '<td>'+(r.perfiles?.nombre||r.observador_nombre||'-')+'</td>'+
-    '<td><span class="tipo-pill tipo-'+r.tipo+'">'+r.tipo+'</span></td>'+
-    '<td>'+(r.turno||'-')+'</td>'+
-    '<td>'+(r.tramo||'-')+'</td>'+
-    '<td>'+(r.subtipo||r.uso||'-')+'</td>'+
-    '</tr>'
-  ).join('');
+
+  tbody.innerHTML = adminRegistros.map((r, i) => {
+    const nombre = perfilesCache[r.observador_id] || r.observador_nombre || '-';
+    const hora   = r.timestamp_reg ? new Date(r.timestamp_reg).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '-';
+    return '<tr>'+
+      '<td style="color:var(--gris-texto)">'+(i+1)+'</td>'+
+      '<td>'+formatFechaTbl(r.fecha)+'</td>'+
+      '<td>'+hora+'</td>'+
+      '<td style="font-weight:600">'+nombre+'</td>'+
+      '<td><span class="tipo-pill tipo-'+r.tipo+'">'+r.tipo+'</span></td>'+
+      '<td>'+(r.turno||'-')+'</td>'+
+      '<td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">'+(r.tramo||'-')+'</td>'+
+      '<td>'+(r.subtipo||r.uso||'-')+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function limpiarFiltros() {
+  document.getElementById('admin-filter-user').value  = '';
+  document.getElementById('admin-filter-tipo').value  = '';
+  document.getElementById('admin-filter-desde').value = '';
+  document.getElementById('admin-filter-hasta').value = '';
+  document.getElementById('admin-filter-tramo').value = '';
+  cargarAdmin();
 }
 
 function formatFechaTbl(f) {
   if (!f) return '-';
-  if (typeof f === 'string' && f.includes('-')) {
-    const [y,m,d] = f.split('T')[0].split('-');
-    return d+'/'+m+'/'+y;
-  }
-  return f;
+  const s = String(f).split('T')[0];
+  const [y,m,d] = s.split('-');
+  return d && m && y ? d+'/'+m+'/'+y : f;
 }
 
 function descargarAdminTXT(filtro) {
