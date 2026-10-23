@@ -443,9 +443,9 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
 
           <div class="field">
             <label>Genero</label>
-            <div class="chip-group" id="a-gen">
-              <div class="chip-opt" onclick="radio(this,'a-gen')">Femenino</div>
-              <div class="chip-opt" onclick="radio(this,'a-gen')">Masculino</div>
+            <div class="check-group" id="a-gen">
+              <div class="check-opt" onclick="toggleGenero(this,'a-gen')"><div class="check-icon"></div>Femenino</div>
+              <div class="check-opt" onclick="toggleGenero(this,'a-gen')"><div class="check-icon"></div>Masculino</div>
             </div>
             <div class="err" id="err-a-gen">Requerido</div>
           </div>
@@ -603,9 +603,9 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
 
           <div class="field">
             <label>Genero</label>
-            <div class="chip-group" id="m-gen">
-              <div class="chip-opt" onclick="radio(this,'m-gen')">Femenino</div>
-              <div class="chip-opt" onclick="radio(this,'m-gen')">Masculino</div>
+            <div class="check-group" id="m-gen">
+              <div class="check-opt" onclick="toggleGenero(this,'m-gen')"><div class="check-icon"></div>Femenino</div>
+              <div class="check-opt" onclick="toggleGenero(this,'m-gen')"><div class="check-icon"></div>Masculino</div>
             </div>
           </div>
 
@@ -640,7 +640,7 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
               <div class="pasajero-sub-title">Datos del Pasajero</div>
               <div class="field"><label>Rango etario</label><div class="chip-group" id="mp-edad"><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Bebe</div></div><div class="err" id="err-mp-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Casco puesto</label><div class="chip-group" id="mp-cas"><div class="chip-opt" onclick="radio(this,'mp-cas')">Si</div><div class="chip-opt" onclick="radio(this,'mp-cas')">No</div><div class="chip-opt" onclick="radio(this,'mp-cas')">NV</div></div><div class="err" id="err-mp-cas">Requerido</div></div>
-              <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="chip-group" id="mp-gen"><div class="chip-opt" onclick="radio(this,'mp-gen')">Femenino</div><div class="chip-opt" onclick="radio(this,'mp-gen')">Masculino</div></div><div class="err" id="err-mp-gen">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="check-group" id="mp-gen"><div class="check-opt" onclick="toggleGenero(this,'mp-gen')"><div class="check-icon"></div>Femenino</div><div class="check-opt" onclick="toggleGenero(this,'mp-gen')"><div class="check-icon"></div>Masculino</div></div><div class="err" id="err-mp-gen">Requerido</div></div>
             </div>
 
             <!-- Pasajero Extra moto (solo visible cuando hay pasajero principal) -->
@@ -654,7 +654,7 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
                 <div class="pasajero-sub-title">Datos del Pasajero Extra</div>
                 <div class="field"><label>Rango etario</label><div class="chip-group" id="mpe-edad"><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Bebe</div></div><div class="err" id="err-mpe-edad">Requerido</div></div>
                 <div class="field" style="margin-top:0.75rem"><label>Casco puesto</label><div class="chip-group" id="mpe-cas"><div class="chip-opt" onclick="radio(this,'mpe-cas')">Si</div><div class="chip-opt" onclick="radio(this,'mpe-cas')">No</div><div class="chip-opt" onclick="radio(this,'mpe-cas')">NV</div></div><div class="err" id="err-mpe-cas">Requerido</div></div>
-                <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="chip-group" id="mpe-gen"><div class="chip-opt" onclick="radio(this,'mpe-gen')">Femenino</div><div class="chip-opt" onclick="radio(this,'mpe-gen')">Masculino</div></div><div class="err" id="err-mpe-gen">Requerido</div></div>
+                <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="check-group" id="mpe-gen"><div class="check-opt" onclick="toggleGenero(this,'mpe-gen')"><div class="check-icon"></div>Femenino</div><div class="check-opt" onclick="toggleGenero(this,'mpe-gen')"><div class="check-icon"></div>Masculino</div></div><div class="err" id="err-mpe-gen">Requerido</div></div>
               </div>
             </div>
           </div>
@@ -918,10 +918,17 @@ async function doLogin() {
   const btn   = document.getElementById('btn-login');
   const err   = document.getElementById('login-err');
   err.classList.remove('show');
+  if (!email || !pass) { err.textContent = 'Completa email y contrasena'; err.classList.add('show'); return; }
   btn.disabled = true; btn.textContent = 'Ingresando...';
   const { error } = await db.auth.signInWithPassword({ email, password: pass });
   btn.disabled = false; btn.textContent = 'Ingresar';
-  if (error) { err.textContent = 'Email o contrasena incorrectos'; err.classList.add('show'); }
+  if (error) {
+    err.textContent = 'Email o contrasena incorrectos';
+    err.classList.add('show');
+  } else {
+    // Signal cargarPerfil to open admin panel after login
+    window._openAdminAfterLogin = true;
+  }
 }
 
 async function doRegistro() {
@@ -973,7 +980,6 @@ async function cargarPerfil() {
     const { data, error } = await db.from('perfiles').select('*').eq('id', currentUser.id).single();
 
     if (error || !data) {
-      // Perfil no existe aun — crearlo
       const nombre = currentUser.user_metadata?.nombre || currentUser.email.split('@')[0];
       await db.from('perfiles').upsert({ id: currentUser.id, nombre, es_admin: false });
       currentPerfil = { id: currentUser.id, nombre, es_admin: false };
@@ -985,24 +991,34 @@ async function cargarPerfil() {
     document.getElementById('user-chip').textContent = nombre;
     document.getElementById('observador').value = nombre;
 
-    // Mostrar botones admin si corresponde
-    if (currentPerfil?.es_admin === true || currentPerfil?.es_admin === 'TRUE') {
-      document.getElementById('btn-admin-link').style.display = 'block';
-      // Mostrar btn admin en barras de autos y motos
+    // Detect es_admin — Supabase can return boolean, string 'TRUE'/'t', or true
+    const esAdmin = currentPerfil?.es_admin === true
+                 || currentPerfil?.es_admin === 'TRUE'
+                 || currentPerfil?.es_admin === 't'
+                 || currentPerfil?.es_admin === 'true';
+
+    if (esAdmin) {
+      ['btn-admin-link'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+      });
       ['admin-btn-auto','admin-btn-moto'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = 'flex';
       });
-      // Expandir icon-bar a 4 columnas para admins
       ['icon-bar-auto','icon-bar-moto'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
       });
+      // If came from admin login flow → open admin panel directly
+      if (window._openAdminAfterLogin) {
+        window._openAdminAfterLogin = false;
+        setTimeout(() => mostrarAdmin(), 200);
+      }
     }
-
   } catch(e) {
-    // Fallback silencioso
-    const nombre = currentUser.email.split('@')[0];
+    console.error('cargarPerfil error:', e);
+    const nombre = currentUser.email?.split('@')[0] || 'Usuario';
     document.getElementById('user-chip').textContent = nombre;
     document.getElementById('observador').value = nombre;
   }
@@ -1060,7 +1076,11 @@ function loadLocalStorage() {
 // ══ SUPABASE SYNC ══
 async function guardarEnSupabase(reg) {
   // Anonymous users don't sync to Supabase
-  if (currentUser?.isAnon) return true;
+  if (currentUser?.isAnon) {
+    console.log('Anon user — skipping Supabase sync');
+    return true;
+  }
+  console.log('Saving to Supabase...', { tipo: reg.tipo, tramo: reg.tramo });
   const { error } = await db.from('registros').insert({
     observador_id:    currentUser.id,
     observador_nombre: currentPerfil?.nombre || currentUser.email,
@@ -1236,7 +1256,10 @@ async function guardarRegistro(tipo) {
     valRadio('a-tipo', 'err-a-tipo', 'Tipo de vehiculo');
 
     // Genero conductor — obligatorio
-    valRadio('a-gen', 'err-a-gen', 'Genero del conductor');
+    // Genero conductor auto (multi-select)
+    const genAOk = !!document.getElementById('a-gen')?.querySelector('.checked');
+    setErr('err-a-gen', !genAOk);
+    if (!genAOk) errores.push({ id: 'a-gen', label: 'Genero del conductor' });
 
     // Cinturon conductor — obligatorio
     valRadio('a-cin', 'err-a-cin', 'Cinturon del conductor');
@@ -1325,7 +1348,7 @@ async function guardarRegistro(tipo) {
 
   if (tipo === 'auto') {
     reg.subtipo      = getRadio('a-tipo');
-    reg.genero       = getRadio('a-gen');
+    reg.genero       = getGenero('a-gen');
     reg.cinturon     = getRadio('a-cin');
     reg.distracciones= getChecked('a-dis');
     reg.pasajeros    = getPasAuto();
@@ -1343,16 +1366,16 @@ async function guardarRegistro(tipo) {
     resetAutoForm();
   } else {
     reg.uso          = getRadio('m-uso');
-    reg.genero       = getRadio('m-gen');
+    reg.genero       = getGenero('m-gen');
     reg.casco        = getRadio('m-cas');
     reg.distracciones= getChecked('m-dis');
     reg.tiene_pas    = document.getElementById('m-pas-toggle').checked?'Si':'No';
-    reg.mp_edad= getRadio('mp-edad'); reg.mp_cas= getRadio('mp-cas'); reg.mp_gen= getRadio('mp-gen');
+    reg.mp_edad= getRadio('mp-edad'); reg.mp_cas= getRadio('mp-cas'); reg.mp_gen= getGenero('mp-gen');
     const extra = document.getElementById('m-pas-extra-toggle').checked;
     reg.tiene_pas_extra = extra?'Si':'No';
     reg.mpe_edad= extra?getRadio('mpe-edad'):'';
     reg.mpe_cas = extra?getRadio('mpe-cas'):'';
-    reg.mpe_gen = extra?getRadio('mpe-gen'):'';
+    reg.mpe_gen = extra?getGenero('mpe-gen'):'';
     reg.tiene_pat= getRadio('m-tpat');
     reg.mercosur = getRadio('m-merc');
     reg.patente  = document.getElementById('m-pat')?.value.trim()||'';
@@ -1437,6 +1460,18 @@ function toggleSub(secId, el) {
   document.getElementById(secId).style.display = el.classList.contains('checked') ? 'block' : 'none';
 }
 
+// Genero: multi-select (puede ser ambos), deselecciona al doble click
+function toggleGenero(el, gid) {
+  el.classList.toggle('checked');
+  const errEl = document.getElementById('err-' + gid);
+  if (errEl && document.getElementById(gid).querySelector('.checked')) errEl.classList.remove('show');
+}
+
+function getGenero(gid) {
+  const checked = Array.from(document.getElementById(gid).querySelectorAll('.checked')).map(e => e.textContent.trim());
+  return checked.join(' / ');
+}
+
 // When clicking edad in passenger: if Bebe → show SRI option in cinturon
 const edadCinMap = {
   'pd-edad':  'pd-cin',
@@ -1508,8 +1543,12 @@ function getPasAuto() {
 // Navigation
 
 function resetAutoForm() {
-  ['a-tipo','a-gen','a-cin','a-tpat','a-merc','pd-edad','pd-cin','pi-edad','pi-cin','pc-edad','pc-cin','pde-edad','pde-cin','pext1-edad','pext2-edad','pea-edad','pea-cin'].forEach(id => {
+  ['a-tipo','a-cin','a-tpat','a-merc','pd-edad','pd-cin','pi-edad','pi-cin','pc-edad','pc-cin','pde-edad','pde-cin','pext1-edad','pext2-edad','pea-edad','pea-cin'].forEach(id => {
     document.getElementById(id).querySelectorAll('.chip-opt').forEach(c => c.classList.remove('sel'));
+  });
+  document.getElementById('a-gen').querySelectorAll('.check-opt').forEach(c => c.classList.remove('checked'));
+  // dummy to avoid syntax error
+  [].forEach(id => {
   });
   document.getElementById('a-dis').querySelectorAll('.check-opt').forEach(c => c.classList.remove('checked'));
   ['pas-adelante','pas-extra-adel','pas-atras-izq','pas-atras-cen','pas-atras-der','pas-atras-ext'].forEach(id => document.getElementById(id).classList.remove('checked'));
@@ -1523,8 +1562,14 @@ function resetAutoForm() {
 }
 
 function resetMotoForm() {
-  ['m-uso','m-gen','m-cas','m-tpat','m-merc','mp-edad','mp-cas','mp-gen','mpe-edad','mpe-cas','mpe-gen'].forEach(id => {
+  ['m-uso','m-cas','m-tpat','m-merc','mp-edad','mp-cas','mpe-edad','mpe-cas'].forEach(id => {
     document.getElementById(id).querySelectorAll('.chip-opt').forEach(c => c.classList.remove('sel'));
+  });
+  ['m-gen','mp-gen','mpe-gen'].forEach(id => {
+    const g = document.getElementById(id); if(g) g.querySelectorAll('.check-opt').forEach(c => c.classList.remove('checked'));
+  });
+  // dummy
+  [].forEach(id => {
   });
   document.getElementById('m-dis').querySelectorAll('.check-opt').forEach(c => c.classList.remove('checked'));
   const mp = document.getElementById('m-pat'); if(mp) mp.value='';
