@@ -455,11 +455,12 @@ select,input[type=text],input[type=date]{min-height:44px;}
         <div class="form-body">
 
           <div class="field">
-            <label>Uso de la moto</label>
+            <label>Uso de la moto <span class="req">*</span></label>
             <div class="chip-group" id="m-uso">
               <div class="chip-opt" onclick="radio(this,'m-uso')">Particular</div>
               <div class="chip-opt" onclick="radio(this,'m-uso')">Comercial</div>
             </div>
+            <div class="err" id="err-m-uso">Requerido</div>
           </div>
 
           <div class="sec">Datos del Conductor</div>
@@ -914,6 +915,7 @@ async function guardarRegistro(tipo) {
     });
 
   } else {
+    validar('m-uso', 'Uso de la moto');
     validar('m-cas', 'Casco del conductor');
     validar('m-dis', 'Distracciones', '.checked');
 
@@ -1257,7 +1259,7 @@ function exportarTXT() {
             codEdad(r.pc_edad, tieneCen),codCascoPas(r.pc_cin, tieneCen),
             codEdad(r.pde_edad, tieneDer),codCascoPas(r.pde_cin, tieneDer),
             patVal,merc,pat,encuestador,fechaFin,fecha,turno,po,
-            'S/D','S/D','','','','',aux].join(';');
+            'S/D','S/D','0','0','0','0',aux].join(';');
   });
 
   const limpiar = s => s.replace(/\s+/g,'_').replace(/[^\w\-]/g,'');
