@@ -690,6 +690,7 @@ const SK = 'omsv_relev_obs_v3';
 const SK_OBS = 'omsv_observador';
 let sesion = {}, registros = [], pendientes = [];
 let tipoActual = '';
+let inicioObs = null; // cuando empezo la observacion en curso (fechaInicio del TXT)
 
 // ══ UTILIDADES ══
 function $(id) { return document.getElementById(id); }
@@ -836,6 +837,7 @@ function cerrarModalVeh() { $('modal-veh').classList.remove('show'); }
 
 function irPaso3(tipo) {
   tipoActual = tipo;
+  inicioObs = new Date().toISOString();
   $('paso1').style.display = 'none';
   $('paso3-auto').style.display = tipo==='auto' ? 'block' : 'none';
   $('paso3-moto').style.display = tipo==='moto' ? 'block' : 'none';
@@ -935,6 +937,7 @@ async function guardarRegistro(tipo) {
 
   const ahora = new Date();
   const reg = {
+    inicio: inicioObs || ahora.toISOString(),
     timestamp: ahora.toISOString(),
     fecha: sesion.fecha || ahora.toISOString().slice(0,10),
     observador: sesion.observador,
@@ -981,6 +984,7 @@ async function guardarRegistro(tipo) {
 
   // Guardar localmente primero, despues intentar sync
   registros.push(reg);
+  inicioObs = reg.timestamp; // la proxima observacion arranca cuando termina esta
   if (navigator.onLine) {
     setSyncDot('syncing');
     const ok = await guardarEnSupabase(reg);
@@ -1135,22 +1139,20 @@ function resetMotoForm() {
 }
 
 // ══ EXPORT TXT ══
+// Formato de la base: separador ";", fin de linea CRLF y codificacion Windows-1252 (ANSI)
+const CP1252_EXTRA = {'€':0x80,'‚':0x82,'ƒ':0x83,'„':0x84,'…':0x85,'†':0x86,'‡':0x87,'ˆ':0x88,'‰':0x89,'Š':0x8A,'‹':0x8B,'Œ':0x8C,'Ž':0x8E,
+  '‘':0x91,'’':0x92,'“':0x93,'”':0x94,'•':0x95,'–':0x96,'—':0x97,'˜':0x98,'™':0x99,'š':0x9A,'›':0x9B,'œ':0x9C,'ž':0x9E,'Ÿ':0x9F};
+function aWindows1252(txt) {
+  const bytes = new Uint8Array(txt.length);
+  for (let i = 0; i < txt.length; i++) {
+    const ch = txt[i], c = txt.charCodeAt(i);
+    bytes[i] = (c < 0x80 || (c >= 0xA0 && c <= 0xFF)) ? c : (CP1252_EXTRA[ch] ?? 0x3F);
+  }
+  return bytes;
+}
+
 function exportarTXT() {
   if (registros.length===0) { showToast('No hay registros aun'); return; }
-
-  const feriados = ['2026-01-01','2026-02-16','2026-02-17','2026-03-24','2026-04-02','2026-04-03',
-    '2026-05-01','2026-05-25','2026-06-15','2026-06-20','2026-07-09','2026-08-17',
-    '2026-10-12','2026-11-20','2026-12-08','2026-12-25',
-    '2025-01-01','2025-03-24','2025-04-02','2025-04-18','2025-05-01','2025-05-25',
-    '2025-06-20','2025-07-09','2025-08-18','2025-10-12','2025-11-20','2025-12-08','2025-12-25'];
-
-  function diaHabil(fechaISO) {
-    if (!fechaISO) return '';
-    const dow = new Date(fechaISO + 'T12:00:00').getDay();
-    if (dow===0 || dow===6) return '0';
-    if (feriados.includes(fechaISO)) return '0';
-    return '1';
-  }
 
   // V4 Uso moto: 1=Particular, 2=Comercial
   function codUso(v) { return v==='Particular'?'1': v==='Comercial'?'2':''; }
@@ -1170,13 +1172,12 @@ function exportarTXT() {
   // V7 Casco/Cinturon: 1=tiene, 2=no tiene, 3=no determinado
   function codCasco(v) { return v==='Si'?'1': v==='No'?'2': v==='NV'?'3':''; }
 
-  // V8 Distraccion: 1=celular, 2=fuma, 3=come/bebe, 4=sin distraccion
+  // V8 Distraccion: 1=celular, 2=fuma, 3=come/bebe, 4=sin distraccion.
+  // Si hay varias se concatenan en ese orden (ej: celular y fuma = 12)
   function codDis(v) {
-    if (!v || v==='Ninguna') return '4';
-    if (v.includes('Usa Celular')) return '1';
-    if (v.includes('Fuma')) return '2';
-    if (v.includes('Bebe/Come')) return '3';
-    return '4';
+    const cods = [['Usa Celular','1'],['Fuma','2'],['Bebe/Come','3']]
+      .filter(([op]) => (v || '').includes(op)).map(([,c]) => c).join('');
+    return cods || '4';
   }
 
   // V9/V11/V13/V15 edad pasajero: 1=adulto, 2=joven, 3=nino, 4=bebe, 9=sin pasajero
@@ -1191,8 +1192,8 @@ function exportarTXT() {
     return (v==='Si'||v==='SRI')?'1': v==='No'?'2': v==='NV'?'3':'0';
   }
 
-  // V17 TienePatente: 1=si, 2=no, 3=S/D
-  function codPat(v) { return v==='Si'?'1': v==='No'?'2': v==='S/D'?'3':''; }
+  // V17 TienePatente: 1=si, 2=no, 3=no determinado (S/D o sin marcar)
+  function codPat(v) { return v==='Si'?'1': v==='No'?'2': '3'; }
 
   // V18 Mercosur: 1=si, 2=no, 9=cuando TienePatente != Si
   function codMerc(tienePat, merc) {
@@ -1217,14 +1218,19 @@ function exportarTXT() {
            p(dt.getHours())+':'+p(dt.getMinutes())+':'+p(dt.getSeconds());
   }
 
+  const encabezado = ['ID','fechaInicio','Tipocomercial','Uso','Sexo','Conductor_edad','Cascocond','Distraccion1',
+    'Pasajero_edad','CascoPas','PasE1','CascoPasE1','PasE2','CascoPasE2','PasE3','CascoPasE3',
+    'TienePatente','Patentemercosur','Patente','Encuestador','fechaFin','Fecha','Turno','PO',
+    'Clima','Temperatura','sexo_pas','sexo_pasE1','sexo_pasE2','sexo_pasE3','aux'].join(';');
+  const aux = '1';
+
   const lineas = registros.map((r, i) => {
     const id          = i + 1;
-    const fechaIni    = fmtDatetime(r.timestamp);
-    const fechaFin    = fechaIni;
+    const fechaIni    = fmtDatetime(r.inicio || r.timestamp);
+    const fechaFin    = fmtDatetime(r.timestamp);
     const fecha       = fmtFecha(r.fecha);
     const turno       = codTurno(r.turno);
     const po          = r.tramo || '';
-    const habil       = diaHabil(r.fecha);
     const encuestador = (r.observador || sesion.observador || '').replace(/\s+/g,'_');
     const tipoC       = '0';
     const condEdad    = '2';
@@ -1241,7 +1247,7 @@ function exportarTXT() {
               codEdad(r.mp_edad, tienePas),codCascoPas(r.mp_cas, tienePas),
               codEdad(r.mpe_edad, tienePasExtra),codCascoPas(r.mpe_cas, tienePasExtra),'','','','',
               patVal,merc,pat,encuestador,fechaFin,fecha,turno,po,
-              'S/D','S/D',codSexoPas(r.mp_gen, tienePas),codSexoPas(r.mpe_gen, tienePasExtra),'','',id,habil].join(';');
+              'S/D','S/D',codSexoPas(r.mp_gen, tienePas),codSexoPas(r.mpe_gen, tienePasExtra),'','',aux].join(';');
     }
 
     const tieneDel = !!r.pd_edad, tieneIzq = !!r.pi_edad, tieneCen = !!r.pc_edad, tieneDer = !!r.pde_edad;
@@ -1251,7 +1257,7 @@ function exportarTXT() {
             codEdad(r.pc_edad, tieneCen),codCascoPas(r.pc_cin, tieneCen),
             codEdad(r.pde_edad, tieneDer),codCascoPas(r.pde_cin, tieneDer),
             patVal,merc,pat,encuestador,fechaFin,fecha,turno,po,
-            'S/D','S/D','','','','',id,habil].join(';');
+            'S/D','S/D','','','','',aux].join(';');
   });
 
   const limpiar = s => s.replace(/\s+/g,'_').replace(/[^\w\-]/g,'');
@@ -1260,7 +1266,7 @@ function exportarTXT() {
   const tur2  = sesion.turno || '';
   const lug2  = limpiar(sesion.tramo || 'lugar');
   const tipo2 = tipoActual==='auto'?'Autos': tipoActual==='moto'?'Motos':'registros';
-  const blob  = new Blob([lineas.join('\n')], {type:'text/plain;charset=utf-8;'});
+  const blob  = new Blob([aWindows1252([encabezado, ...lineas].join('\r\n') + '\r\n')], {type:'text/plain;charset=windows-1252;'});
   const url   = URL.createObjectURL(blob);
   const a     = document.createElement('a');
   a.href = url; a.download = 'RelObs'+tipo2+'_'+obs2+'_'+fech2+'_'+tur2+'_'+lug2+'.txt';
@@ -1383,10 +1389,21 @@ function descargarAdminTXT(filtro) {
   // Reusa exportarTXT con los datos de Supabase y despues restaura el estado local
   const tmp = { registros, sesion, tipoActual };
 
-  // Mismos campos que un registro local
-  registros = regs.map(r => ({
+  // fechaInicio = fin del registro anterior del mismo observador, fecha y turno
+  // (la base no guarda la hora de inicio; el primero de cada turno usa su propia hora)
+  const fin = r => r.timestamp_reg || r.created_at;
+  const inicios = new Map(), ultimo = new Map();
+  adminData.slice().sort((a,b) => new Date(fin(a)) - new Date(fin(b))).forEach(r => {
+    const clave = [r.observador_nombre, r.fecha, r.turno].join('|');
+    inicios.set(r, ultimo.get(clave) || fin(r));
+    ultimo.set(clave, fin(r));
+  });
+
+  // Mismos campos que un registro local, del mas viejo al mas nuevo como en la base
+  registros = regs.slice().sort((a,b) => new Date(fin(a)) - new Date(fin(b))).map(r => ({
     ...r,
-    timestamp: r.timestamp_reg || r.created_at,
+    inicio: inicios.get(r),
+    timestamp: fin(r),
     fecha: r.fecha?.split('T')[0] || '',
     observador: r.observador_nombre || ''
   }));
