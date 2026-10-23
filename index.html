@@ -97,6 +97,7 @@ select,input[type=text],input[type=date]{min-height:44px;}
 .chip-opt,.check-opt{min-height:44px;display:flex;align-items:center;padding:8px 14px;border:1.5px solid var(--gris-borde);background:var(--gris-bg);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--gris-texto);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:all 0.12s ease;}
 .chip-opt:active,.check-opt:active{transform:scale(0.96);}
 .chip-opt.sel{background:var(--azul);border-color:var(--azul);color:var(--amarillo);}
+.sri-opt{display:none;}
 .check-opt{gap:8px;}
 .check-opt.checked{background:#e8f5e9;border-color:var(--verde);color:var(--verde);}
 .check-icon{width:16px;height:16px;border:1.5px solid currentColor;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -361,13 +362,13 @@ select,input[type=text],input[type=date]{min-height:44px;}
               <div class="pasajero-sub-title">Pasajero Extra Atras 1 — Rango etario</div>
               <div class="chip-group" id="pext1-edad">
                 <div class="chip-opt" onclick="radio(this,'pext1-edad')">Adulto</div>
-                <div class="chip-opt" onclick="radio(this,'pext1-edad')">Nino</div>
+                <div class="chip-opt" onclick="radio(this,'pext1-edad')">Niño</div>
                 <div class="chip-opt" onclick="radio(this,'pext1-edad')">Bebe</div>
               </div>
               <div class="pasajero-sub-title" style="margin-top:0.75rem">Pasajero Extra Atras 2 — Rango etario</div>
               <div class="chip-group" id="pext2-edad">
                 <div class="chip-opt" onclick="radio(this,'pext2-edad')">Adulto</div>
-                <div class="chip-opt" onclick="radio(this,'pext2-edad')">Nino</div>
+                <div class="chip-opt" onclick="radio(this,'pext2-edad')">Niño</div>
                 <div class="chip-opt" onclick="radio(this,'pext2-edad')">Bebe</div>
               </div>
             </div>
@@ -377,33 +378,33 @@ select,input[type=text],input[type=date]{min-height:44px;}
           <div id="pas-extra-adel-sec" style="display:none">
             <div class="pasajero-sub">
               <div class="pasajero-sub-title">Pasajero Extra Adelante</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pea-edad"><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Bebe</div></div><div class="err" id="err-pea-edad">Requerido</div></div>
-              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pea-cin"><div class="chip-opt" onclick="radio(this,'pea-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pea-cin')">No</div><div class="chip-opt" onclick="radio(this,'pea-cin')">NV</div></div><div class="err" id="err-pea-cin">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pea-edad"><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Bebe</div></div><div class="err" id="err-pea-edad">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pea-cin"><div class="chip-opt" onclick="radio(this,'pea-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pea-cin')">No</div><div class="chip-opt" onclick="radio(this,'pea-cin')">NV</div><div class="chip-opt sri-opt" onclick="radio(this,'pea-cin')">SRI</div></div><div class="err" id="err-pea-cin">Requerido</div></div>
             </div>
           </div>
 
           <div id="pas-del-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Delantero</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pd-edad"><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Bebe</div></div><div class="err" id="err-pd-edad">Requerido</div></div>
-              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pd-cin"><div class="chip-opt" onclick="radio(this,'pd-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pd-cin')">No</div><div class="chip-opt" onclick="radio(this,'pd-cin')">NV</div></div><div class="err" id="err-pd-cin">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pd-edad"><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Bebe</div></div><div class="err" id="err-pd-edad">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pd-cin"><div class="chip-opt" onclick="radio(this,'pd-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pd-cin')">No</div><div class="chip-opt" onclick="radio(this,'pd-cin')">NV</div><div class="chip-opt sri-opt" onclick="radio(this,'pd-cin')">SRI</div></div><div class="err" id="err-pd-cin">Requerido</div></div>
             </div>
           </div>
           <div id="pas-izq-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Trasero Izquierdo</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pi-edad"><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Bebe</div></div><div class="err" id="err-pi-edad">Requerido</div></div>
-              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pi-cin"><div class="chip-opt" onclick="radio(this,'pi-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pi-cin')">No</div><div class="chip-opt" onclick="radio(this,'pi-cin')">NV</div></div><div class="err" id="err-pi-cin">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pi-edad"><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Bebe</div></div><div class="err" id="err-pi-edad">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pi-cin"><div class="chip-opt" onclick="radio(this,'pi-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pi-cin')">No</div><div class="chip-opt" onclick="radio(this,'pi-cin')">NV</div><div class="chip-opt sri-opt" onclick="radio(this,'pi-cin')">SRI</div></div><div class="err" id="err-pi-cin">Requerido</div></div>
             </div>
           </div>
           <div id="pas-cen-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Trasero Centro</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pc-edad"><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Bebe</div></div><div class="err" id="err-pc-edad">Requerido</div></div>
-              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pc-cin"><div class="chip-opt" onclick="radio(this,'pc-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pc-cin')">No</div><div class="chip-opt" onclick="radio(this,'pc-cin')">NV</div></div><div class="err" id="err-pc-cin">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pc-edad"><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Bebe</div></div><div class="err" id="err-pc-edad">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pc-cin"><div class="chip-opt" onclick="radio(this,'pc-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pc-cin')">No</div><div class="chip-opt" onclick="radio(this,'pc-cin')">NV</div><div class="chip-opt sri-opt" onclick="radio(this,'pc-cin')">SRI</div></div><div class="err" id="err-pc-cin">Requerido</div></div>
             </div>
           </div>
           <div id="pas-der-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Trasero Derecho</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pde-edad"><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Bebe</div></div><div class="err" id="err-pde-edad">Requerido</div></div>
-              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pde-cin"><div class="chip-opt" onclick="radio(this,'pde-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pde-cin')">No</div><div class="chip-opt" onclick="radio(this,'pde-cin')">NV</div></div><div class="err" id="err-pde-cin">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pde-edad"><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Bebe</div></div><div class="err" id="err-pde-edad">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pde-cin"><div class="chip-opt" onclick="radio(this,'pde-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pde-cin')">No</div><div class="chip-opt" onclick="radio(this,'pde-cin')">NV</div><div class="chip-opt sri-opt" onclick="radio(this,'pde-cin')">SRI</div></div><div class="err" id="err-pde-cin">Requerido</div></div>
             </div>
           </div>
 
@@ -500,7 +501,7 @@ select,input[type=text],input[type=date]{min-height:44px;}
           <div id="m-pas-sec" style="display:none;margin-top:0.75rem">
             <div class="pasajero-sub">
               <div class="pasajero-sub-title">Datos del Pasajero</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="mp-edad"><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Bebe</div></div><div class="err" id="err-mp-edad">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="mp-edad"><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Bebe</div></div><div class="err" id="err-mp-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Casco puesto</label><div class="chip-group" id="mp-cas"><div class="chip-opt" onclick="radio(this,'mp-cas')">Si</div><div class="chip-opt" onclick="radio(this,'mp-cas')">No</div><div class="chip-opt" onclick="radio(this,'mp-cas')">NV</div></div><div class="err" id="err-mp-cas">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="check-group" id="mp-gen"><div class="check-opt" onclick="toggleGenero(this,'mp-gen')"><div class="check-icon"></div>Femenino</div><div class="check-opt" onclick="toggleGenero(this,'mp-gen')"><div class="check-icon"></div>Masculino</div></div><div class="err" id="err-mp-gen">Requerido</div></div>
             </div>
@@ -514,7 +515,7 @@ select,input[type=text],input[type=date]{min-height:44px;}
             <div id="m-pas-extra-sec" style="display:none;margin-top:0.5rem">
               <div class="pasajero-sub">
                 <div class="pasajero-sub-title">Datos del Pasajero Extra</div>
-                <div class="field"><label>Rango etario</label><div class="chip-group" id="mpe-edad"><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Bebe</div></div><div class="err" id="err-mpe-edad">Requerido</div></div>
+                <div class="field"><label>Rango etario</label><div class="chip-group" id="mpe-edad"><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Niño</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Bebe</div></div><div class="err" id="err-mpe-edad">Requerido</div></div>
                 <div class="field" style="margin-top:0.75rem"><label>Casco puesto</label><div class="chip-group" id="mpe-cas"><div class="chip-opt" onclick="radio(this,'mpe-cas')">Si</div><div class="chip-opt" onclick="radio(this,'mpe-cas')">No</div><div class="chip-opt" onclick="radio(this,'mpe-cas')">NV</div></div><div class="err" id="err-mpe-cas">Requerido</div></div>
                 <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="check-group" id="mpe-gen"><div class="check-opt" onclick="toggleGenero(this,'mpe-gen')"><div class="check-icon"></div>Femenino</div><div class="check-opt" onclick="toggleGenero(this,'mpe-gen')"><div class="check-icon"></div>Masculino</div></div><div class="err" id="err-mpe-gen">Requerido</div></div>
               </div>
@@ -1049,7 +1050,8 @@ function toggleGenero(el, gid) {
   if ($(gid).querySelector('.checked')) setErr('err-'+gid, false);
 }
 
-// Si el pasajero es Bebe, la primera opcion de cinturon/casco pasa a "SRI"
+// Auto: si el pasajero es Niño o Bebe, el cinturon suma la opcion "SRI"
+// Moto: si el pasajero es Bebe, la primera opcion de casco pasa a "SRI"
 const edadCinMap = {
   'pd-edad':  'pd-cin',
   'pi-edad':  'pi-cin',
@@ -1064,8 +1066,16 @@ function radioEdad(el, gid) {
   radio(el, gid);
   const cinGroup = $(edadCinMap[gid]);
   if (!cinGroup) return;
+  const edad = getRadio(gid);
+  const sri = cinGroup.querySelector('.sri-opt');
+  if (sri) {
+    const mostrar = edad === 'Niño' || edad === 'Bebe';
+    sri.style.display = mostrar ? 'flex' : 'none';
+    if (!mostrar) sri.classList.remove('sel');
+    return;
+  }
   const first = cinGroup.querySelector('.chip-opt');
-  if (first) first.textContent = el.textContent.trim() === 'Bebe' ? 'SRI' : 'Si';
+  if (first) first.textContent = edad === 'Bebe' ? 'SRI' : 'Si';
 }
 
 // Datos de patente: solo visibles si "Tiene patente" = Si
@@ -1122,7 +1132,7 @@ function resetAutoForm() {
   ['pas-adelante','pas-extra-adel','pas-atras-izq','pas-atras-cen','pas-atras-der','pas-atras-ext'].forEach(id => $(id).classList.remove('checked'));
   ['pas-del-sec','pas-izq-sec','pas-cen-sec','pas-der-sec','pas-ext-sec','pas-extra-adel-sec','a-pat-sec'].forEach(id => $(id).style.display='none');
   $('a-pat').value = '';
-  resetSiLabel('pd-cin','pi-cin','pc-cin','pde-cin','pea-cin');
+  document.querySelectorAll('#paso3-auto .sri-opt').forEach(o => o.style.display = '');
 }
 
 function resetMotoForm() {
@@ -1183,13 +1193,13 @@ function exportarTXT() {
   // V9/V11/V13/V15 edad pasajero: 1=adulto, 2=joven, 3=nino, 4=bebe, 9=sin pasajero
   function codEdad(v, tiene) {
     if (!tiene) return '9';
-    return v==='Adulto'?'1': v==='Nino'?'3': v==='Bebe'?'4': '9';
+    return v==='Adulto'?'1': (v==='Niño'||v==='Nino')?'3': v==='Bebe'?'4': '9';
   }
 
-  // V10/V12/V14/V16 casco pasajero: 0=sin pasajero, 1=tiene, 2=no, 3=ND
+  // V10/V12/V14/V16 casco/cinturon pasajero: 0=sin pasajero, 1=tiene (incluye SRI), 2=no, 3=ND
   function codCascoPas(v, tiene) {
     if (!tiene) return '0';
-    return v==='Si'?'1': v==='No'?'2': v==='NV'?'3':'0';
+    return (v==='Si'||v==='SRI')?'1': v==='No'?'2': v==='NV'?'3':'0';
   }
 
   // V17 TienePatente: 1=si, 2=no, 3=S/D
@@ -1302,7 +1312,7 @@ async function cargarAdmin() {
   tbody.innerHTML = '<tr><td colspan="8"><div class="admin-loading"><div class="spinner"></div>Cargando registros...</div></td></tr>';
 
   let query = db.from('registros')
-    .select('id, created_at, timestamp_reg, fecha, turno, tramo, tipo, observador_nombre, subtipo, uso, genero, cinturon, casco, distracciones, pasajeros, pd_edad, pd_cin, pi_edad, pi_cin, pc_edad, pc_cin, pde_edad, pde_cin, pext1_edad, pext2_edad, pea_edad, pea_cin, tiene_pas, mp_edad, mp_cas, mp_gen, tiene_pas_extra, mpe_edad, mpe_cas, mpe_gen, tiene_pat, mercosur, patente')
+    .select('*')
     .order('created_at', { ascending: false })
     .limit(1000);
 
