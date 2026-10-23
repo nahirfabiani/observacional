@@ -1,10 +1,15 @@
-const CACHE_NAME = 'omsv-relev-v2';
+const CACHE_NAME = 'omsv-relev-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './icons/logo.png',
+  './icons/auto.png',
+  './icons/moto.png',
+  './icons/auto-modal.png',
+  './icons/moto-modal.png',
   'https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700;800&display=swap'
 ];
 
@@ -26,6 +31,8 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  // Las consultas a Supabase siempre van a la red (el panel admin tiene que ver datos frescos)
+  if (new URL(event.request.url).hostname.endsWith('supabase.co')) return;
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
