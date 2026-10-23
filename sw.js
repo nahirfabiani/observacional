@@ -1,4 +1,4 @@
-const CACHE_NAME = 'omsv-relev-v4';
+const CACHE_NAME = 'omsv-relev-v5';
 const ASSETS = [
   './',
   './index.html',

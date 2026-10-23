@@ -1051,31 +1051,22 @@ function toggleGenero(el, gid) {
 }
 
 // Auto: si el pasajero es Niño o Bebe, el cinturon suma la opcion "SRI"
-// Moto: si el pasajero es Bebe, la primera opcion de casco pasa a "SRI"
 const edadCinMap = {
   'pd-edad':  'pd-cin',
   'pi-edad':  'pi-cin',
   'pc-edad':  'pc-cin',
   'pde-edad': 'pde-cin',
   'pea-edad': 'pea-cin',
-  'mp-edad':  'mp-cas',
-  'mpe-edad': 'mpe-cas',
 };
 
 function radioEdad(el, gid) {
   radio(el, gid);
-  const cinGroup = $(edadCinMap[gid]);
-  if (!cinGroup) return;
+  const sri = $(edadCinMap[gid])?.querySelector('.sri-opt');
+  if (!sri) return;
   const edad = getRadio(gid);
-  const sri = cinGroup.querySelector('.sri-opt');
-  if (sri) {
-    const mostrar = edad === 'Niño' || edad === 'Bebe';
-    sri.style.display = mostrar ? 'flex' : 'none';
-    if (!mostrar) sri.classList.remove('sel');
-    return;
-  }
-  const first = cinGroup.querySelector('.chip-opt');
-  if (first) first.textContent = edad === 'Bebe' ? 'SRI' : 'Si';
+  const mostrar = edad === 'Niño' || edad === 'Bebe';
+  sri.style.display = mostrar ? 'flex' : 'none';
+  if (!mostrar) sri.classList.remove('sel');
 }
 
 // Datos de patente: solo visibles si "Tiene patente" = Si
@@ -1124,7 +1115,6 @@ function getChecked(gid, sep = ', ') {
 
 function clearChips(...ids)  { ids.forEach(id => $(id).querySelectorAll('.chip-opt').forEach(c => c.classList.remove('sel'))); }
 function clearChecks(...ids) { ids.forEach(id => $(id).querySelectorAll('.check-opt').forEach(c => c.classList.remove('checked'))); }
-function resetSiLabel(...ids) { ids.forEach(id => { const o = $(id).querySelector('.chip-opt'); if (o) o.textContent = 'Si'; }); }
 
 function resetAutoForm() {
   clearChips('a-tipo','a-cin','a-tpat','a-merc','pd-edad','pd-cin','pi-edad','pi-cin','pc-edad','pc-cin','pde-edad','pde-cin','pext1-edad','pext2-edad','pea-edad','pea-cin');
@@ -1142,7 +1132,6 @@ function resetMotoForm() {
   $('m-pas-toggle').checked = false;
   $('m-pas-extra-toggle').checked = false;
   ['m-pas-sec','m-pas-extra-sec','m-pat-sec'].forEach(id => $(id).style.display='none');
-  resetSiLabel('mp-cas','mpe-cas');
 }
 
 // ══ EXPORT TXT ══
