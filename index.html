@@ -17,7 +17,7 @@
 /* ── BASE ── */
 :root{
   --azul:#153244;--amarillo:#FFD200;--teal:#7FDED9;
-  --celeste:#5BC4D4;--rojo:#D93025;--verde:#2E7D32;
+  --celeste:#5BC4D4;--rojo:#D93025;
   --blanco:#FFFFFF;--gris-bg:#F4F6F8;
   --gris-borde:#D8DFE8;--gris-texto:#4A5568;
   --safe-top:env(safe-area-inset-top,0px);
@@ -99,16 +99,16 @@ select,input[type=text],input[type=date]{min-height:44px;}
 .chip-opt.sel{background:var(--azul);border-color:var(--azul);color:var(--amarillo);}
 .sri-opt{display:none;}
 .check-opt{gap:8px;}
-.check-opt.checked{background:#e8f5e9;border-color:var(--verde);color:var(--verde);}
+.check-opt.checked{background:var(--azul);border-color:var(--azul);color:var(--amarillo);}
 .check-icon{width:16px;height:16px;border:1.5px solid currentColor;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.check-opt.checked .check-icon::after{content:'';width:9px;height:5px;border-left:2px solid var(--verde);border-bottom:2px solid var(--verde);transform:rotate(-45deg) translateY(-2px);}
+.check-opt.checked .check-icon::after{content:'';width:9px;height:5px;border-left:2px solid var(--amarillo);border-bottom:2px solid var(--amarillo);transform:rotate(-45deg) translateY(-2px);}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0;border-top:1px solid var(--gris-borde);margin-top:0.6rem;}
 .toggle-label{font-size:13px;font-weight:600;color:var(--azul);}
 .toggle{position:relative;width:44px;height:24px;cursor:pointer;}
 .toggle input{opacity:0;width:0;height:0;}
 .toggle-slider{position:absolute;inset:0;background:var(--gris-borde);border-radius:12px;transition:0.2s;}
 .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s;}
-.toggle input:checked + .toggle-slider{background:var(--verde);}
+.toggle input:checked + .toggle-slider{background:var(--azul);}
 .toggle input:checked + .toggle-slider::before{transform:translateX(20px);}
 .pasajero-sub{background:#f0f7ff;border:1.5px solid var(--celeste);padding:0.9rem 1rem;margin-top:0.6rem;border-radius:4px;}
 .pasajero-sub-title{font-size:11px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--azul);margin-bottom:0.75rem;}
