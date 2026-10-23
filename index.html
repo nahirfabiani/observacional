@@ -272,13 +272,25 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
   <div class="auth-title">OMSV</div>
   <div class="auth-sub">Relevamiento Observacional</div>
   <div class="auth-card">
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Ingresar</button>
-      <button class="auth-tab" id="tab-registro" onclick="switchTab('registro')">Registrarse</button>
+    <!-- No tabs visible — acceso rapido by default -->
+
+    <!-- ACCESO RAPIDO (solo nombre) -->
+    <div id="form-acceso">
+      <div class="auth-field">
+        <label>Tu nombre y apellido</label>
+        <input type="text" id="acceso-nombre" placeholder="Nombre Apellido" autocomplete="name"/>
+      </div>
+      <button class="auth-btn" id="btn-acceso" onclick="doAccesoRapido()">Ingresar al registro</button>
+      <div class="auth-err" id="acceso-err"></div>
+      <div style="margin-top:1rem;text-align:center;">
+        <button onclick="switchTab('admin-login')" style="background:none;border:none;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.35);cursor:pointer;text-decoration:underline;">
+          Acceso administradores
+        </button>
+      </div>
     </div>
 
-    <!-- LOGIN -->
-    <div id="form-login">
+    <!-- LOGIN ADMIN -->
+    <div id="form-login" style="display:none">
       <div class="auth-field">
         <label>Email</label>
         <input type="email" id="login-email" placeholder="nombre@gcba.gob.ar" autocomplete="email"/>
@@ -287,11 +299,24 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
         <label>Contrasena</label>
         <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
       </div>
-      <button class="auth-btn" id="btn-login" onclick="doLogin()">Ingresar</button>
+      <button class="auth-btn" id="btn-login" onclick="doLogin()">Ingresar como admin</button>
       <div class="auth-err" id="login-err"></div>
+      <div style="margin-top:0.75rem;text-align:center;">
+        <button onclick="doRestorePass()" style="background:none;border:none;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.35);cursor:pointer;text-decoration:underline;">
+          Olvide mi contrasena
+        </button>
+      </div>
+      <div class="auth-ok" id="restore-ok" style="display:none;margin-top:0.5rem;font-size:11px;font-weight:600;color:#7FDED9;text-align:center;">
+        Te enviamos un email para restablecer tu contrasena.
+      </div>
+      <div style="margin-top:0.75rem;text-align:center;">
+        <button onclick="switchTab('acceso')" style="background:none;border:none;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.35);cursor:pointer;text-decoration:underline;">
+          &larr; Volver
+        </button>
+      </div>
     </div>
 
-    <!-- REGISTRO -->
+    <!-- REGISTRO (oculto, acceso solo via admin) -->
     <div id="form-registro" style="display:none">
       <div class="auth-field">
         <label>Nombre completo</label>
@@ -410,8 +435,8 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
             <div class="chip-group" id="a-tipo">
               <div class="chip-opt" onclick="radio(this,'a-tipo')">Automovil</div>
               <div class="chip-opt" onclick="radio(this,'a-tipo')">Utilitario</div>
-              <div class="chip-opt" onclick="radio(this,'a-tipo')">Chofer de aplicacion</div>
             </div>
+            <div class="err" id="err-a-tipo">Requerido</div>
           </div>
 
           <div class="sec">Datos del Conductor</div>
@@ -422,6 +447,7 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
               <div class="chip-opt" onclick="radio(this,'a-gen')">Femenino</div>
               <div class="chip-opt" onclick="radio(this,'a-gen')">Masculino</div>
             </div>
+            <div class="err" id="err-a-gen">Requerido</div>
           </div>
 
           <div class="field">
@@ -450,7 +476,7 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
             <label>Asientos ocupados</label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
               <div class="check-opt" id="pas-adelante" onclick="toggleCheck(this);toggleSub('pas-del-sec',this)"><div class="check-icon"></div>Adelante</div>
-              <div class="check-opt" id="pas-extra-adel" onclick="toggleCheck(this)"><div class="check-icon"></div>Extra Adelante</div>
+              <div class="check-opt" id="pas-extra-adel" onclick="toggleCheck(this);toggleSub('pas-extra-adel-sec',this)"><div class="check-icon"></div>Extra Adelante</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
               <div class="check-opt" id="pas-atras-izq" onclick="toggleCheck(this);toggleSub('pas-izq-sec',this)"><div class="check-icon"></div>Atras Izq</div>
@@ -466,13 +492,13 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
           <!-- Pasajeros extra datos (2 slots) -->
           <div id="pas-ext-sec" style="display:none">
             <div class="pasajero-sub">
-              <div class="pasajero-sub-title">Pasajero Extra 1 — Rango etario</div>
+              <div class="pasajero-sub-title">Pasajero Extra Atras 1 — Rango etario</div>
               <div class="chip-group" id="pext1-edad">
                 <div class="chip-opt" onclick="radio(this,'pext1-edad')">Adulto</div>
                 <div class="chip-opt" onclick="radio(this,'pext1-edad')">Nino</div>
                 <div class="chip-opt" onclick="radio(this,'pext1-edad')">Bebe</div>
               </div>
-              <div class="pasajero-sub-title" style="margin-top:0.75rem">Pasajero Extra 2 — Rango etario</div>
+              <div class="pasajero-sub-title" style="margin-top:0.75rem">Pasajero Extra Atras 2 — Rango etario</div>
               <div class="chip-group" id="pext2-edad">
                 <div class="chip-opt" onclick="radio(this,'pext2-edad')">Adulto</div>
                 <div class="chip-opt" onclick="radio(this,'pext2-edad')">Nino</div>
@@ -481,27 +507,36 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
             </div>
           </div>
 
+          <!-- Pasajero Extra Adelante (condicional) -->
+          <div id="pas-extra-adel-sec" style="display:none">
+            <div class="pasajero-sub">
+              <div class="pasajero-sub-title">Pasajero Extra Adelante</div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pea-edad"><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pea-edad')">Bebe</div></div><div class="err" id="err-pea-edad">Requerido</div></div>
+              <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pea-cin"><div class="chip-opt" onclick="radio(this,'pea-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pea-cin')">No</div><div class="chip-opt" onclick="radio(this,'pea-cin')">NV</div></div><div class="err" id="err-pea-cin">Requerido</div></div>
+            </div>
+          </div>
+
           <div id="pas-del-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Delantero</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pd-edad"><div class="chip-opt" onclick="radio(this,'pd-edad')">Adulto</div><div class="chip-opt" onclick="radio(this,'pd-edad')">Nino</div><div class="chip-opt" onclick="radio(this,'pd-edad')">Bebe</div></div><div class="err" id="err-pd-edad">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pd-edad"><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pd-edad')">Bebe</div></div><div class="err" id="err-pd-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pd-cin"><div class="chip-opt" onclick="radio(this,'pd-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pd-cin')">No</div><div class="chip-opt" onclick="radio(this,'pd-cin')">NV</div></div><div class="err" id="err-pd-cin">Requerido</div></div>
             </div>
           </div>
           <div id="pas-izq-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Trasero Izquierdo</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pi-edad"><div class="chip-opt" onclick="radio(this,'pi-edad')">Adulto</div><div class="chip-opt" onclick="radio(this,'pi-edad')">Nino</div><div class="chip-opt" onclick="radio(this,'pi-edad')">Bebe</div></div><div class="err" id="err-pi-edad">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pi-edad"><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pi-edad')">Bebe</div></div><div class="err" id="err-pi-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pi-cin"><div class="chip-opt" onclick="radio(this,'pi-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pi-cin')">No</div><div class="chip-opt" onclick="radio(this,'pi-cin')">NV</div></div><div class="err" id="err-pi-cin">Requerido</div></div>
             </div>
           </div>
           <div id="pas-cen-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Trasero Centro</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pc-edad"><div class="chip-opt" onclick="radio(this,'pc-edad')">Adulto</div><div class="chip-opt" onclick="radio(this,'pc-edad')">Nino</div><div class="chip-opt" onclick="radio(this,'pc-edad')">Bebe</div></div><div class="err" id="err-pc-edad">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pc-edad"><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pc-edad')">Bebe</div></div><div class="err" id="err-pc-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pc-cin"><div class="chip-opt" onclick="radio(this,'pc-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pc-cin')">No</div><div class="chip-opt" onclick="radio(this,'pc-cin')">NV</div></div><div class="err" id="err-pc-cin">Requerido</div></div>
             </div>
           </div>
           <div id="pas-der-sec" style="display:none">
             <div class="pasajero-sub"><div class="pasajero-sub-title">Pasajero Trasero Derecho</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="pde-edad"><div class="chip-opt" onclick="radio(this,'pde-edad')">Adulto</div><div class="chip-opt" onclick="radio(this,'pde-edad')">Nino</div><div class="chip-opt" onclick="radio(this,'pde-edad')">Bebe</div></div><div class="err" id="err-pde-edad">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="pde-edad"><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'pde-edad')">Bebe</div></div><div class="err" id="err-pde-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Cinturon</label><div class="chip-group" id="pde-cin"><div class="chip-opt" onclick="radio(this,'pde-cin')">Si</div><div class="chip-opt" onclick="radio(this,'pde-cin')">No</div><div class="chip-opt" onclick="radio(this,'pde-cin')">NV</div></div><div class="err" id="err-pde-cin">Requerido</div></div>
             </div>
           </div>
@@ -603,7 +638,7 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
           <div id="m-pas-sec" style="display:none;margin-top:0.75rem">
             <div class="pasajero-sub">
               <div class="pasajero-sub-title">Datos del Pasajero</div>
-              <div class="field"><label>Rango etario</label><div class="chip-group" id="mp-edad"><div class="chip-opt" onclick="radio(this,'mp-edad')">Adulto</div><div class="chip-opt" onclick="radio(this,'mp-edad')">Nino</div><div class="chip-opt" onclick="radio(this,'mp-edad')">Bebe</div></div><div class="err" id="err-mp-edad">Requerido</div></div>
+              <div class="field"><label>Rango etario</label><div class="chip-group" id="mp-edad"><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'mp-edad')">Bebe</div></div><div class="err" id="err-mp-edad">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Casco puesto</label><div class="chip-group" id="mp-cas"><div class="chip-opt" onclick="radio(this,'mp-cas')">Si</div><div class="chip-opt" onclick="radio(this,'mp-cas')">No</div><div class="chip-opt" onclick="radio(this,'mp-cas')">NV</div></div><div class="err" id="err-mp-cas">Requerido</div></div>
               <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="chip-group" id="mp-gen"><div class="chip-opt" onclick="radio(this,'mp-gen')">Femenino</div><div class="chip-opt" onclick="radio(this,'mp-gen')">Masculino</div></div><div class="err" id="err-mp-gen">Requerido</div></div>
             </div>
@@ -617,7 +652,7 @@ select, input[type=text], input[type=email], input[type=password], input[type=nu
             <div id="m-pas-extra-sec" style="display:none;margin-top:0.5rem">
               <div class="pasajero-sub">
                 <div class="pasajero-sub-title">Datos del Pasajero Extra</div>
-                <div class="field"><label>Rango etario</label><div class="chip-group" id="mpe-edad"><div class="chip-opt" onclick="radio(this,'mpe-edad')">Adulto</div><div class="chip-opt" onclick="radio(this,'mpe-edad')">Nino</div><div class="chip-opt" onclick="radio(this,'mpe-edad')">Bebe</div></div><div class="err" id="err-mpe-edad">Requerido</div></div>
+                <div class="field"><label>Rango etario</label><div class="chip-group" id="mpe-edad"><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Adulto</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Nino</div><div class="chip-opt" onclick="radioEdad(this,'mpe-edad')">Bebe</div></div><div class="err" id="err-mpe-edad">Requerido</div></div>
                 <div class="field" style="margin-top:0.75rem"><label>Casco puesto</label><div class="chip-group" id="mpe-cas"><div class="chip-opt" onclick="radio(this,'mpe-cas')">Si</div><div class="chip-opt" onclick="radio(this,'mpe-cas')">No</div><div class="chip-opt" onclick="radio(this,'mpe-cas')">NV</div></div><div class="err" id="err-mpe-cas">Requerido</div></div>
                 <div class="field" style="margin-top:0.75rem"><label>Genero</label><div class="chip-group" id="mpe-gen"><div class="chip-opt" onclick="radio(this,'mpe-gen')">Femenino</div><div class="chip-opt" onclick="radio(this,'mpe-gen')">Masculino</div></div><div class="err" id="err-mpe-gen">Requerido</div></div>
               </div>
@@ -835,10 +870,46 @@ let currentUser = null, currentPerfil = null;
 
 // ══ AUTH ══
 function switchTab(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab==='login');
-  document.getElementById('tab-registro').classList.toggle('active', tab==='registro');
-  document.getElementById('form-login').style.display    = tab==='login'    ? 'block':'none';
-  document.getElementById('form-registro').style.display = tab==='registro' ? 'block':'none';
+  document.getElementById('form-acceso').style.display   = tab==='acceso'       ? 'block':'none';
+  document.getElementById('form-login').style.display    = tab==='admin-login'  ? 'block':'none';
+  document.getElementById('form-registro').style.display = tab==='registro'     ? 'block':'none';
+}
+
+async function doAccesoRapido() {
+  const nombre = document.getElementById('acceso-nombre').value.trim();
+  const err = document.getElementById('acceso-err');
+  err.classList.remove('show');
+  if (!nombre || nombre.split(' ').filter(p => p.length > 0).length < 2) {
+    err.textContent = 'Ingresa tu nombre y apellido';
+    err.classList.add('show');
+    return;
+  }
+  // Login anonimo con nombre como identificador
+  currentUser = { id: 'anon_' + Date.now(), email: '', isAnon: true };
+  currentPerfil = { nombre, es_admin: false };
+  mostrarApp();
+}
+
+async function doRestorePass() {
+  const email = document.getElementById('login-email').value.trim();
+  const ok = document.getElementById('restore-ok');
+  const err = document.getElementById('login-err');
+  ok.style.display = 'none';
+  err.classList.remove('show');
+  if (!email) {
+    err.textContent = 'Ingresa tu email primero';
+    err.classList.add('show');
+    return;
+  }
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin
+  });
+  if (error) {
+    err.textContent = 'Error: ' + error.message;
+    err.classList.add('show');
+  } else {
+    ok.style.display = 'block';
+  }
 }
 
 async function doLogin() {
@@ -874,16 +945,23 @@ async function doRegistro() {
 }
 
 async function doLogout() {
-  await db.auth.signOut();
+  if (currentUser?.isAnon) {
+    currentUser = null;
+    currentPerfil = null;
+    mostrarAuth();
+  } else {
+    await db.auth.signOut();
+  }
 }
 
 // Auth state listener
 db.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
+    currentUser.isAnon = false;
     await cargarPerfil();
     mostrarApp();
-  } else {
+  } else if (!currentUser?.isAnon) {
     currentUser = null;
     currentPerfil = null;
     mostrarAuth();
@@ -933,6 +1011,8 @@ async function cargarPerfil() {
 function mostrarAuth() {
   document.getElementById('auth-screen').style.display = 'flex';
   document.getElementById('main-app').style.display    = 'none';
+  // Show quick access form by default
+  switchTab('acceso');
 }
 
 function mostrarApp() {
@@ -979,6 +1059,8 @@ function loadLocalStorage() {
 
 // ══ SUPABASE SYNC ══
 async function guardarEnSupabase(reg) {
+  // Anonymous users don't sync to Supabase
+  if (currentUser?.isAnon) return true;
   const { error } = await db.from('registros').insert({
     observador_id:    currentUser.id,
     observador_nombre: currentPerfil?.nombre || currentUser.email,
@@ -1000,6 +1082,8 @@ async function guardarEnSupabase(reg) {
     pde_edad:         reg.pde_edad || null, pde_cin: reg.pde_cin || null,
     pext1_edad:       reg.pext1_edad || null,
     pext2_edad:       reg.pext2_edad || null,
+    pea_edad:         reg.pea_edad   || null,
+    pea_cin:          reg.pea_cin    || null,
     tiene_pas:        reg.tiene_pas || null,
     mp_edad:          reg.mp_edad || null, mp_cas: reg.mp_cas || null, mp_gen: reg.mp_gen || null,
     tiene_pas_extra:  reg.tiene_pas_extra || null,
@@ -1148,6 +1232,12 @@ async function guardarRegistro(tipo) {
   }
 
   if (tipo === 'auto') {
+    // Tipo de vehiculo — obligatorio
+    valRadio('a-tipo', 'err-a-tipo', 'Tipo de vehiculo');
+
+    // Genero conductor — obligatorio
+    valRadio('a-gen', 'err-a-gen', 'Genero del conductor');
+
     // Cinturon conductor — obligatorio
     valRadio('a-cin', 'err-a-cin', 'Cinturon del conductor');
 
@@ -1158,10 +1248,11 @@ async function guardarRegistro(tipo) {
 
     // Pasajeros: validar edad Y cinturon por cada asiento marcado
     const seats = [
-      { check:'pas-adelante',  sec:'pas-del-sec', edadId:'pd-edad',  cinId:'pd-cin',  errEdad:'err-pd-edad',  errCin:'err-pd-cin'  },
-      { check:'pas-atras-izq', sec:'pas-izq-sec', edadId:'pi-edad',  cinId:'pi-cin',  errEdad:'err-pi-edad',  errCin:'err-pi-cin'  },
-      { check:'pas-atras-cen', sec:'pas-cen-sec', edadId:'pc-edad',  cinId:'pc-cin',  errEdad:'err-pc-edad',  errCin:'err-pc-cin'  },
-      { check:'pas-atras-der', sec:'pas-der-sec', edadId:'pde-edad', cinId:'pde-cin', errEdad:'err-pde-edad', errCin:'err-pde-cin' },
+      { check:'pas-adelante',  sec:'pas-del-sec',        edadId:'pd-edad',   cinId:'pd-cin',  errEdad:'err-pd-edad',  errCin:'err-pd-cin'  },
+      { check:'pas-extra-adel',sec:'pas-extra-adel-sec', edadId:'pea-edad',  cinId:'pea-cin', errEdad:'err-pea-edad', errCin:'err-pea-cin' },
+      { check:'pas-atras-izq', sec:'pas-izq-sec',        edadId:'pi-edad',   cinId:'pi-cin',  errEdad:'err-pi-edad',  errCin:'err-pi-cin'  },
+      { check:'pas-atras-cen', sec:'pas-cen-sec',        edadId:'pc-edad',   cinId:'pc-cin',  errEdad:'err-pc-edad',  errCin:'err-pc-cin'  },
+      { check:'pas-atras-der', sec:'pas-der-sec',        edadId:'pde-edad',  cinId:'pde-cin', errEdad:'err-pde-edad', errCin:'err-pde-cin' },
     ];
     seats.forEach(s => {
       const marcado = document.getElementById(s.check)?.classList.contains('checked');
@@ -1244,6 +1335,8 @@ async function guardarRegistro(tipo) {
     reg.pde_edad= getRadio('pde-edad'); reg.pde_cin= getRadio('pde-cin');
     reg.pext1_edad = getRadio('pext1-edad');
     reg.pext2_edad = getRadio('pext2-edad');
+    reg.pea_edad   = getRadio('pea-edad');
+    reg.pea_cin    = getRadio('pea-cin');
     reg.tiene_pat= getRadio('a-tpat');
     reg.mercosur = getRadio('a-merc');
     reg.patente  = document.getElementById('a-pat')?.value.trim()||'';
@@ -1312,10 +1405,13 @@ function ejecutarReset() {
 
 // ══ HELPERS CHIP/CHECK ══
 function radio(el, gid) {
+  const alreadySel = el.classList.contains('sel');
   document.getElementById(gid).querySelectorAll('.chip-opt').forEach(c => c.classList.remove('sel'));
-  el.classList.add('sel');
-  const errEl = document.getElementById('err-' + gid);
-  if (errEl) errEl.classList.remove('show');
+  if (!alreadySel) {
+    el.classList.add('sel');
+    const errEl = document.getElementById('err-' + gid);
+    if (errEl) errEl.classList.remove('show');
+  }
 }
 
 function toggleCheck(el) { el.classList.toggle('checked'); }
@@ -1339,6 +1435,29 @@ function toggleDis(el, gid, esNinguna) {
 
 function toggleSub(secId, el) {
   document.getElementById(secId).style.display = el.classList.contains('checked') ? 'block' : 'none';
+}
+
+// When clicking edad in passenger: if Bebe → show SRI option in cinturon
+const edadCinMap = {
+  'pd-edad':  'pd-cin',
+  'pi-edad':  'pi-cin',
+  'pc-edad':  'pc-cin',
+  'pde-edad': 'pde-cin',
+  'pea-edad': 'pea-cin',
+  'mp-edad':  'mp-cas',
+  'mpe-edad': 'mpe-cas',
+};
+
+function radioEdad(el, gid) {
+  radio(el, gid);
+  const cinGid = edadCinMap[gid];
+  if (!cinGid) return;
+  const esSRI = el.textContent.trim() === 'Bebe';
+  const cinGroup = document.getElementById(cinGid);
+  if (!cinGroup) return;
+  const opts = cinGroup.querySelectorAll('.chip-opt');
+  // First chip: Si → SRI when Bebe
+  if (opts[0]) opts[0].textContent = esSRI ? 'SRI' : 'Si';
 }
 
 // Patente section toggle (only show if Si)
@@ -1389,13 +1508,18 @@ function getPasAuto() {
 // Navigation
 
 function resetAutoForm() {
-  ['a-tipo','a-gen','a-cin','a-tpat','a-merc','pd-edad','pd-cin','pi-edad','pi-cin','pc-edad','pc-cin','pde-edad','pde-cin','pext1-edad','pext2-edad'].forEach(id => {
+  ['a-tipo','a-gen','a-cin','a-tpat','a-merc','pd-edad','pd-cin','pi-edad','pi-cin','pc-edad','pc-cin','pde-edad','pde-cin','pext1-edad','pext2-edad','pea-edad','pea-cin'].forEach(id => {
     document.getElementById(id).querySelectorAll('.chip-opt').forEach(c => c.classList.remove('sel'));
   });
   document.getElementById('a-dis').querySelectorAll('.check-opt').forEach(c => c.classList.remove('checked'));
   ['pas-adelante','pas-extra-adel','pas-atras-izq','pas-atras-cen','pas-atras-der','pas-atras-ext'].forEach(id => document.getElementById(id).classList.remove('checked'));
+  ['pas-del-sec','pas-izq-sec','pas-cen-sec','pas-der-sec','pas-ext-sec','pas-extra-adel-sec','a-pat-sec'].forEach(id => document.getElementById(id).style.display='none');
   const ap = document.getElementById('a-pat'); if(ap) ap.value='';
-  ['pas-del-sec','pas-izq-sec','pas-cen-sec','pas-der-sec','pas-ext-sec','a-pat-sec'].forEach(id => document.getElementById(id).style.display='none');
+  // Restore Si label (may have been changed to SRI)
+  ['pd-cin','pi-cin','pc-cin','pde-cin','pea-cin'].forEach(gid => {
+    const g = document.getElementById(gid);
+    if (g) { const o = g.querySelector('.chip-opt'); if(o) o.textContent='Si'; }
+  });
 }
 
 function resetMotoForm() {
@@ -1409,6 +1533,11 @@ function resetMotoForm() {
   document.getElementById('m-pas-extra-toggle').checked = false;
   document.getElementById('m-pas-extra-sec').style.display = 'none';
   document.getElementById('m-pat-sec').style.display = 'none';
+  // Restore Si label in casco
+  ['mp-cas','mpe-cas'].forEach(gid => {
+    const g = document.getElementById(gid);
+    if (g) { const o = g.querySelector('.chip-opt'); if(o) o.textContent='Si'; }
+  });
 }
 
 function getRadio(gid) {
@@ -1782,7 +1911,9 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => navigato
 // Start: check auth session
 (async () => {
   const { data } = await db.auth.getSession();
-  if (!data.session) mostrarAuth();
+  if (!data.session) {
+    mostrarAuth();
+  }
 })();
 </script>
 </body>
