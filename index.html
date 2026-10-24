@@ -1218,8 +1218,10 @@ function generarTXT(regs) {
            p(dt.getHours())+':'+p(dt.getMinutes())+':'+p(dt.getSeconds());
   }
 
-  const encabezado = ['ID','fechaInicio','Tipocomercial','Uso','Sexo','Conductor_edad','Cascocond','Distraccion1',
-    'Pasajero_edad','CascoPas','PasE1','CascoPasE1','PasE2','CascoPasE2','PasE3','CascoPasE3',
+  // En la base de autos las columnas de casco se llaman de cinturon
+  const prot = regs[0]?.tipo === 'auto' ? 'Cinturon' : 'Casco';
+  const encabezado = ['ID','fechaInicio','Tipocomercial','Uso','Sexo','Conductor_edad',prot+'cond','Distraccion1',
+    'Pasajero_edad',prot+'Pas','PasE1',prot+'PasE1','PasE2',prot+'PasE2','PasE3',prot+'PasE3',
     'TienePatente','Patentemercosur','Patente','Encuestador','fechaFin','Fecha','Turno','PO',
     'Clima','Temperatura','sexo_pas','sexo_pasE1','sexo_pasE2','sexo_pasE3','aux'].join(';');
   const aux = '1';
