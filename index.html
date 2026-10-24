@@ -859,9 +859,9 @@ function volverPaso1() {
 
 function cambiarVehiculo(actual) {
   const nuevo = actual==='auto'?'moto':'auto';
-  if (registros.length > 0) {
+  if (registros.some(r => r.tipo === actual)) {
     exportarTXT();
-    setTimeout(() => { registros=[]; save(); actualizarContadores(); irPaso3(nuevo); }, 300);
+    setTimeout(() => { registros = registros.filter(r => r.tipo !== actual); save(); actualizarContadores(); irPaso3(nuevo); }, 300);
   } else { irPaso3(nuevo); }
 }
 
@@ -1153,8 +1153,8 @@ function aWindows1252(txt) {
   return bytes;
 }
 
-function exportarTXT() {
-  if (registros.length===0) { showToast('No hay registros aun'); return; }
+// Arma el contenido del TXT; regs tiene que ser de un solo tipo (auto o moto)
+function generarTXT(regs) {
 
   // V4 Uso moto: 1=Particular, 2=Comercial
   function codUso(v) { return v==='Particular'?'1': v==='Comercial'?'2':''; }
@@ -1226,14 +1226,14 @@ function exportarTXT() {
     'Clima','Temperatura','sexo_pas','sexo_pasE1','sexo_pasE2','sexo_pasE3','aux'].join(';');
   const aux = '1';
 
-  const lineas = registros.map((r, i) => {
+  const lineas = regs.map((r, i) => {
     const id          = i + 1;
     const fechaIni    = fmtDatetime(r.inicio || r.timestamp);
     const fechaFin    = fmtDatetime(r.timestamp);
     const fecha       = fmtFecha(r.fecha);
     const turno       = codTurno(r.turno);
     const po          = r.tramo || '';
-    const encuestador = (r.observador || sesion.observador || '').replace(/\s+/g,'_');
+    const encuestador = (r.observador || '').replace(/\s+/g,'_');
     const tipoC       = '0';
     const condEdad    = '2';
     const patVal      = codPat(r.tiene_pat);
@@ -1262,17 +1262,29 @@ function exportarTXT() {
             'S/D','S/D','0','0','0','0',aux].join(';');
   });
 
-  const limpiar = s => s.replace(/\s+/g,'_').replace(/[^\w\-]/g,'');
-  const obs2  = limpiar(sesion.observador || 'obs');
+  return [encabezado, ...lineas].join('\r\n') + '\r\n';
+}
+
+function descargarTXT(contenido, nombre) {
+  const blob = new Blob([aWindows1252(contenido)], {type:'text/plain;charset=windows-1252;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = nombre;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+const limpiarNombre = s => s.replace(/\s+/g,'_').replace(/[^\w\-]/g,'');
+const nombreTipo = tipo => tipo === 'moto' ? 'Motos' : 'Autos';
+
+// TXT de la sesion local: solo los registros del vehiculo que se esta cargando
+function exportarTXT() {
+  const regs = registros.filter(r => r.tipo === tipoActual);
+  if (regs.length === 0) { showToast('No hay registros aun'); return; }
+  const obs2  = limpiarNombre(sesion.observador || 'obs');
   const fech2 = (sesion.fecha || new Date().toISOString().slice(0,10)).replace(/-/g,'');
   const tur2  = sesion.turno || '';
-  const lug2  = limpiar(sesion.tramo || 'lugar');
-  const tipo2 = tipoActual==='auto'?'Autos': tipoActual==='moto'?'Motos':'registros';
-  const blob  = new Blob([aWindows1252([encabezado, ...lineas].join('\r\n') + '\r\n')], {type:'text/plain;charset=windows-1252;'});
-  const url   = URL.createObjectURL(blob);
-  const a     = document.createElement('a');
-  a.href = url; a.download = 'RelObs'+tipo2+'_'+obs2+'_'+fech2+'_'+tur2+'_'+lug2+'.txt';
-  a.click(); URL.revokeObjectURL(url);
+  const lug2  = limpiarNombre(sesion.tramo || 'lugar');
+  descargarTXT(generarTXT(regs), 'RelObs'+nombreTipo(tipoActual)+'_'+obs2+'_'+fech2+'_'+tur2+'_'+lug2+'.txt');
   showToast('TXT descargado');
 }
 
@@ -1384,12 +1396,11 @@ function formatFechaTbl(f) {
   return d && m && y ? d+'/'+m+'/'+y : esc(f);
 }
 
+// Descarga un TXT por tipo de vehiculo ('todos' = un archivo de autos y otro de motos)
 function descargarAdminTXT(filtro) {
-  const regs = filtro === 'todos' ? adminRegistros : adminRegistros.filter(r => r.tipo === filtro);
-  if (regs.length === 0) { showToast('No hay registros para descargar'); return; }
-
-  // Reusa exportarTXT con los datos de Supabase y despues restaura el estado local
-  const tmp = { registros, sesion, tipoActual };
+  const tipos = filtro === 'todos' ? ['auto','moto'] : [filtro];
+  const porTipo = tipos.map(t => [t, adminRegistros.filter(r => r.tipo === t)]).filter(([,regs]) => regs.length > 0);
+  if (porTipo.length === 0) { showToast('No hay registros para descargar'); return; }
 
   // fechaInicio = fin del registro anterior del mismo observador, fecha y turno
   // (la base no guarda la hora de inicio; el primero de cada turno usa su propia hora)
@@ -1401,20 +1412,22 @@ function descargarAdminTXT(filtro) {
     ultimo.set(clave, fin(r));
   });
 
-  // Mismos campos que un registro local, del mas viejo al mas nuevo como en la base
-  registros = regs.slice().sort((a,b) => new Date(fin(a)) - new Date(fin(b))).map(r => ({
-    ...r,
-    inicio: inicios.get(r),
-    timestamp: fin(r),
-    fecha: r.fecha?.split('T')[0] || '',
-    observador: r.observador_nombre || ''
-  }));
-  sesion = { observador: 'Admin', tramo: 'export', turno: '' };
-  tipoActual = filtro === 'todos' ? '' : filtro;
-
-  exportarTXT();
-
-  ({ registros, sesion, tipoActual } = tmp);
+  porTipo.forEach(([tipo, regs], n) => {
+    // Mismos campos que un registro local, del mas viejo al mas nuevo como en la base
+    const lista = regs.slice().sort((a,b) => new Date(fin(a)) - new Date(fin(b))).map(r => ({
+      ...r,
+      inicio: inicios.get(r),
+      timestamp: fin(r),
+      fecha: r.fecha?.split('T')[0] || '',
+      observador: r.observador_nombre || ''
+    }));
+    const fechas = lista.map(r => r.fecha.replace(/-/g,'')).filter(Boolean);
+    const desde = fechas[0] || '', hasta = fechas[fechas.length-1] || '';
+    const rango = desde === hasta ? desde : desde+'-'+hasta;
+    // pausa entre archivos para que el navegador no bloquee la segunda descarga
+    setTimeout(() => descargarTXT(generarTXT(lista), 'RelObs'+nombreTipo(tipo)+'_'+rango+'.txt'), n * 400);
+  });
+  showToast(porTipo.length > 1 ? 'Descargando TXT de autos y motos' : 'TXT descargado');
 }
 
 // ══ OFFLINE / ONLINE ══
