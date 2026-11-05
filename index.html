@@ -192,6 +192,8 @@ select,input[type=text],input[type=date]{min-height:44px;}
 .tipo-pill{font-size:9px;font-weight:800;padding:2px 6px;text-transform:uppercase;border-radius:3px;}
 .tipo-auto{background:rgba(91,196,212,0.2);color:var(--celeste);}
 .tipo-moto{background:rgba(255,210,0,0.2);color:#b8860b;}
+.admin-nota{font-size:11px;font-weight:600;color:var(--gris-texto);margin-bottom:6px;}
+.admin-dl-btn:disabled{opacity:0.6;cursor:wait;}
 .loading-state{text-align:center;padding:2rem;color:var(--gris-texto);font-size:12px;}
 .loading-state.error{color:var(--rojo);}
 .admin-loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:2rem;color:var(--gris-texto);font-size:12px;font-weight:600;}
@@ -578,7 +580,7 @@ select,input[type=text],input[type=date]{min-height:44px;}
       <div class="admin-filtros-row">
         <div>
           <div class="admin-filtro-lbl">Observador</div>
-          <select id="admin-filter-user" onchange="renderAdmin()"><option value="">Todos</option></select>
+          <select id="admin-filter-user" onchange="cargarAdmin()"><option value="">Todos</option></select>
         </div>
         <div>
           <div class="admin-filtro-lbl">Tipo</div>
@@ -602,7 +604,7 @@ select,input[type=text],input[type=date]{min-height:44px;}
       <div>
         <div class="admin-filtro-lbl">Tramo / Punto de observacion</div>
         <div class="admin-tramo-row">
-          <input type="text" id="admin-filter-tramo" placeholder="Buscar por tramo..." autocomplete="off" oninput="renderAdmin()"/>
+          <input type="text" id="admin-filter-tramo" placeholder="Buscar por tramo..." autocomplete="off" oninput="cargarAdminDiferido()"/>
           <button class="admin-limpiar" onclick="limpiarFiltros()">Limpiar</button>
         </div>
       </div>
@@ -623,6 +625,7 @@ select,input[type=text],input[type=date]{min-height:44px;}
       </button>
     </div>
 
+    <div class="admin-nota" id="admin-nota"></div>
     <div class="admin-table-wrap">
       <table class="admin-table">
         <thead>
@@ -1283,7 +1286,10 @@ function exportarTXT() {
 }
 
 // ══ PANEL ADMIN (solo lectura: no permite editar ni borrar) ══
-let adminData = [], adminRegistros = [];
+// Muestra el total de registros y los ultimos 50; las descargas traen de la base
+// todos los registros que cumplen los filtros (sin filtros, la base completa).
+const ADMIN_VISIBLES = 50;
+const ADMIN_PAGINA = 1000; // Supabase devuelve como maximo ~1000 filas por consulta
 
 function esRutaAdmin() {
   return /\/paneladmin\/?$/i.test(location.pathname)
@@ -1295,6 +1301,7 @@ function mostrarAdmin() {
   $('main-app').style.display = 'none';
   $('panel-admin').style.display = 'flex';
   window.scrollTo(0, 0);
+  cargarObservadores();
   cargarAdmin();
 }
 
@@ -1305,77 +1312,121 @@ function cerrarAdmin() {
   volverPaso1();
 }
 
-// Trae de Supabase con los filtros de tipo/fecha; observador y tramo se filtran en renderAdmin
-async function cargarAdmin() {
-  const tbody     = $('admin-tbody');
-  const filtTipo  = $('admin-filter-tipo').value;
-  const filtDesde = $('admin-filter-desde').value;
-  const filtHasta = $('admin-filter-hasta').value;
-
-  tbody.innerHTML = '<tr><td colspan="8"><div class="admin-loading"><div class="spinner"></div>Cargando registros...</div></td></tr>';
-
-  let query = db.from('registros')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(1000);
-
-  if (filtTipo)  query = query.eq('tipo', filtTipo);
-  if (filtDesde) query = query.gte('fecha', filtDesde);
-  if (filtHasta) query = query.lte('fecha', filtHasta);
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error('Admin error:', error);
-    tbody.innerHTML = '<tr><td colspan="8" class="loading-state error">Error: '+esc(error.message)+'</td></tr>';
-    return;
-  }
-
-  adminData = data || [];
-
-  // Opciones del filtro de observador a partir de los registros traidos
-  const sel = $('admin-filter-user');
-  const cur = sel.value;
-  const nombres = [...new Set(adminData.map(r => r.observador_nombre).filter(Boolean))].sort((a,b) => a.localeCompare(b));
-  sel.innerHTML = '<option value="">Todos</option>' +
-    nombres.map(n => '<option value="'+esc(n)+'"'+(n===cur?' selected':'')+'>'+esc(n)+'</option>').join('');
-
-  renderAdmin();
+function filtrosAdmin() {
+  return {
+    observador: $('admin-filter-user').value,
+    tipo:       $('admin-filter-tipo').value,
+    desde:      $('admin-filter-desde').value,
+    hasta:      $('admin-filter-hasta').value,
+    tramo:      $('admin-filter-tramo').value.trim()
+  };
 }
 
-function renderAdmin() {
-  const tbody     = $('admin-tbody');
-  const filtUser  = $('admin-filter-user').value;
-  const filtTramo = $('admin-filter-tramo').value.trim().toLowerCase();
+// Aplica los filtros del panel a una consulta de Supabase
+function conFiltros(query, f) {
+  if (f.observador) query = query.eq('observador_nombre', f.observador);
+  if (f.tipo)       query = query.eq('tipo', f.tipo);
+  if (f.desde)      query = query.gte('fecha', f.desde);
+  if (f.hasta)      query = query.lte('fecha', f.hasta);
+  if (f.tramo)      query = query.ilike('tramo', '%' + f.tramo.replace(/[\\%_]/g, '\\$&') + '%');
+  return query;
+}
 
-  adminRegistros = adminData.filter(r =>
-    (!filtUser  || r.observador_nombre === filtUser) &&
-    (!filtTramo || (r.tramo || '').toLowerCase().includes(filtTramo))
-  );
+async function contar(f) {
+  const { count, error } = await conFiltros(db.from('registros').select('id', { count: 'exact', head: true }), f);
+  if (error) throw error;
+  return count || 0;
+}
 
-  $('stat-total').textContent = adminRegistros.length;
-  $('stat-autos').textContent = adminRegistros.filter(r=>r.tipo==='auto').length;
-  $('stat-motos').textContent = adminRegistros.filter(r=>r.tipo==='moto').length;
-
-  if (adminRegistros.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="loading-state">Sin registros para los filtros seleccionados</td></tr>';
-    return;
+// Trae todas las filas que cumplen los filtros, de a paginas, del mas viejo al mas nuevo
+async function traerTodos(f, columnas = '*') {
+  const filas = [];
+  for (let desde = 0; ; ) {
+    const { data, error } = await conFiltros(db.from('registros').select(columnas), f)
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+      .range(desde, desde + ADMIN_PAGINA - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    filas.push(...data);
+    desde += data.length;
   }
+  return filas;
+}
 
-  tbody.innerHTML = adminRegistros.map((r, i) => {
-    const hora = r.timestamp_reg ? new Date(r.timestamp_reg).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '-';
-    const tipo = r.tipo === 'moto' ? 'moto' : 'auto';
-    return '<tr>'+
-      '<td class="td-num">'+(i+1)+'</td>'+
-      '<td>'+formatFechaTbl(r.fecha)+'</td>'+
-      '<td>'+hora+'</td>'+
-      '<td class="td-user">'+esc(r.observador_nombre || '-')+'</td>'+
-      '<td><span class="tipo-pill tipo-'+tipo+'">'+tipo+'</span></td>'+
-      '<td>'+esc(r.turno || '-')+'</td>'+
-      '<td class="td-tramo">'+esc(r.tramo || '-')+'</td>'+
-      '<td>'+esc(r.subtipo || r.uso || '-')+'</td>'+
-    '</tr>';
-  }).join('');
+// Opciones del filtro de observador: todos los nombres cargados en la base
+async function cargarObservadores() {
+  try {
+    const filas = await traerTodos({}, 'observador_nombre');
+    const sel = $('admin-filter-user');
+    const cur = sel.value;
+    const nombres = [...new Set(filas.map(r => r.observador_nombre).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+    sel.innerHTML = '<option value="">Todos</option>' +
+      nombres.map(n => '<option value="'+esc(n)+'"'+(n===cur?' selected':'')+'>'+esc(n)+'</option>').join('');
+  } catch (e) {
+    console.error('Admin observadores:', e);
+  }
+}
+
+let cargaAdminId = 0, cargaAdminTimer = null;
+
+function cargarAdminDiferido() {
+  clearTimeout(cargaAdminTimer);
+  cargaAdminTimer = setTimeout(cargarAdmin, 400);
+}
+
+async function cargarAdmin() {
+  const id = ++cargaAdminId; // si se cambia un filtro mientras carga, gana la ultima consulta
+  const tbody = $('admin-tbody');
+  const f = filtrosAdmin();
+
+  tbody.innerHTML = '<tr><td colspan="8"><div class="admin-loading"><div class="spinner"></div>Cargando registros...</div></td></tr>';
+  $('admin-nota').textContent = '';
+
+  try {
+    const [total, autos, motos, ultimos] = await Promise.all([
+      contar(f),
+      !f.tipo || f.tipo === 'auto' ? contar({ ...f, tipo: 'auto' }) : 0,
+      !f.tipo || f.tipo === 'moto' ? contar({ ...f, tipo: 'moto' }) : 0,
+      conFiltros(db.from('registros').select('*'), f)
+        .order('created_at', { ascending: false })
+        .limit(ADMIN_VISIBLES)
+        .then(({ data, error }) => { if (error) throw error; return data || []; })
+    ]);
+    if (id !== cargaAdminId) return;
+
+    $('stat-total').textContent = total;
+    $('stat-autos').textContent = autos;
+    $('stat-motos').textContent = motos;
+
+    if (ultimos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="loading-state">Sin registros para los filtros seleccionados</td></tr>';
+      return;
+    }
+
+    $('admin-nota').textContent = total > ultimos.length
+      ? 'Mostrando los ultimos '+ultimos.length+' de '+total+' registros. La descarga incluye todos.'
+      : 'Mostrando '+total+' registros.';
+
+    tbody.innerHTML = ultimos.map((r, i) => {
+      const hora = r.timestamp_reg ? new Date(r.timestamp_reg).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '-';
+      const tipo = r.tipo === 'moto' ? 'moto' : 'auto';
+      return '<tr>'+
+        '<td class="td-num">'+(i+1)+'</td>'+
+        '<td>'+formatFechaTbl(r.fecha)+'</td>'+
+        '<td>'+hora+'</td>'+
+        '<td class="td-user">'+esc(r.observador_nombre || '-')+'</td>'+
+        '<td><span class="tipo-pill tipo-'+tipo+'">'+tipo+'</span></td>'+
+        '<td>'+esc(r.turno || '-')+'</td>'+
+        '<td class="td-tramo">'+esc(r.tramo || '-')+'</td>'+
+        '<td>'+esc(r.subtipo || r.uso || '-')+'</td>'+
+      '</tr>';
+    }).join('');
+  } catch (error) {
+    if (id !== cargaAdminId) return;
+    console.error('Admin error:', error);
+    tbody.innerHTML = '<tr><td colspan="8" class="loading-state error">Error: '+esc(error.message)+'</td></tr>';
+  }
 }
 
 function limpiarFiltros() {
@@ -1390,17 +1441,32 @@ function formatFechaTbl(f) {
   return d && m && y ? d+'/'+m+'/'+y : esc(f);
 }
 
-// Descarga un TXT por tipo de vehiculo ('todos' = un archivo de autos y otro de motos)
-function descargarAdminTXT(filtro) {
+// Descarga un TXT por tipo de vehiculo ('todos' = un archivo de autos y otro de motos),
+// con todos los registros de la base que cumplen los filtros del panel
+async function descargarAdminTXT(filtro) {
+  const botones = document.querySelectorAll('.admin-dl-btn');
+  botones.forEach(b => b.disabled = true);
+  showToast('Preparando descarga...');
+  let datos;
+  try {
+    datos = await traerTodos(filtrosAdmin());
+  } catch (error) {
+    console.error('Admin descarga:', error);
+    showToast('Error al descargar');
+    return;
+  } finally {
+    botones.forEach(b => b.disabled = false);
+  }
+
   const tipos = filtro === 'todos' ? ['auto','moto'] : [filtro];
-  const porTipo = tipos.map(t => [t, adminRegistros.filter(r => r.tipo === t)]).filter(([,regs]) => regs.length > 0);
+  const porTipo = tipos.map(t => [t, datos.filter(r => r.tipo === t)]).filter(([,regs]) => regs.length > 0);
   if (porTipo.length === 0) { showToast('No hay registros para descargar'); return; }
 
   // fechaInicio = fin del registro anterior del mismo observador, fecha y turno
   // (la base no guarda la hora de inicio; el primero de cada turno usa su propia hora)
   const fin = r => r.timestamp_reg || r.created_at;
   const inicios = new Map(), ultimo = new Map();
-  adminData.slice().sort((a,b) => new Date(fin(a)) - new Date(fin(b))).forEach(r => {
+  datos.slice().sort((a,b) => new Date(fin(a)) - new Date(fin(b))).forEach(r => {
     const clave = [r.observador_nombre, r.fecha, r.turno].join('|');
     inicios.set(r, ultimo.get(clave) || fin(r));
     ultimo.set(clave, fin(r));
@@ -1420,7 +1486,8 @@ function descargarAdminTXT(filtro) {
     // pausa entre archivos para que el navegador no bloquee la segunda descarga
     setTimeout(() => descargarTXT(generarTXT(lista), 'RelObs'+nombreTipo(tipo)+'_'+rango+'.txt'), n * 400);
   });
-  showToast(porTipo.length > 1 ? 'Descargando TXT de autos y motos' : 'TXT descargado');
+  const cant = porTipo.reduce((t, [,regs]) => t + regs.length, 0);
+  showToast(cant + ' registros descargados');
 }
 
 // ══ OFFLINE / ONLINE ══
